@@ -32,7 +32,11 @@ class BaseEngine(ABC):
     @abstractmethod
     def dispatch_bars(self, bar):
         ...
-        
+    
+    @abstractmethod
+    def reset_strategies(self):
+        ...
+    
 class BaseDataFeed(ABC):
     def __init__(self):
         self.symbols = []
