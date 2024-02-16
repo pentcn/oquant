@@ -26,7 +26,8 @@ class DualDragon(OptionStrategy):
 
         
     def on_trade_response(self, body):
-         print(f'on_trade_response: {body}')
+        super().on_trade_response(body)
+        ...
          
     def run(self):
         ...

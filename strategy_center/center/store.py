@@ -115,3 +115,13 @@ class StrategyVars(MongoDBManager):
     def __getitem__(self, key):
         cond = {'uuid': key}
         return self.find_one(self.collection_name, cond)
+
+
+class StrategyTrades(MongoDBManager):
+    
+    def __init__(self,account_id,  db_name='oquant_runtime', host='127.0.0.1'):
+        super().__init__(db_name, host)
+        self.collection_name = f'{account_id}:trades'
+    
+    def save(self, trade_info):
+        self.insert_data(self.collection_name, trade_info)

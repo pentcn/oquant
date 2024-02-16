@@ -135,22 +135,7 @@ class BaseTrader(ABC):
     @abstractmethod
     def short_close(self, symbol, amount, price):
         ...
-        
-        
-# class OptionTrader(BaseTrader):
-    
-#     def __init__(self):
-#         super().__init__()
-        
-#     @abstractmethod
-#     def combinate(self, symbol_1, amount_1, symbol_2, amount_2):
-#         ...
-        
-#     @abstractmethod
-#     def release(self, combination_id):
-#         ...
-        
-        
+
 
 class OptionGroup(ABC):
     def __init__(self, strategy):
@@ -184,6 +169,7 @@ class OptionGroup(ABC):
     @abstractmethod
     def on_bars(self, bars):
         pass
+        
         
 class Trader(ABC):
     
