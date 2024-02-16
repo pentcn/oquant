@@ -25,7 +25,9 @@ class DualDragon(OptionStrategy):
             self.day_group.short_open(symbol, 1, bar['close'])
 
         
-    
+    def on_trade_response(self, body):
+         print(f'on_trade_response: {body}')
+         
     def run(self):
         ...
     

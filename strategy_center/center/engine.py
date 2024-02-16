@@ -26,6 +26,12 @@ class OptionEngine(BaseEngine):
         
         # with ThreadPoolExecutor(max_workers=len(self.strategy_list)) as executor:
         #     executor.map(process_strategy, self.strategy_list)
+    
+    def on_trade_response(self, body):
+        for strategy in self.strategy_list:
+            if strategy.id == body['strategy_id']:
+                strategy.on_trade_response(body)
+                break
             
     def start(self):
         self.data_feed.run()

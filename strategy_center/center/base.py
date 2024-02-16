@@ -2,7 +2,6 @@ import pandas as pd
 from functools import wraps
 from abc import ABC, abstractmethod
 
-from common.utilities import dataclass_to_dict
 from strategy_center.center.store import StrategyVars
 
 class BaseEngine(ABC):
@@ -102,7 +101,11 @@ class BaseStrategy(ABC):
             self.minutes_bars = pd.DataFrame([bars[self.underlying_symbol]]) 
         else:
             self.minutes_bars.loc[len(self.minutes_bars)] = bars[self.underlying_symbol]
-        
+    
+    @abstractmethod
+    def on_trade_response(self, body):
+        ...
+    
     @abstractmethod
     def run(self):
         ...
@@ -114,8 +117,8 @@ class BaseStrategy(ABC):
 
 class BaseTrader(ABC):
     
-    def __init__(self):
-        ...
+    def __init__(self, store_host):
+        self.svars = StrategyVars(host=store_host)
     
     @abstractmethod
     def long_open(self, symbol, amount, price):
@@ -148,16 +151,6 @@ class BaseTrader(ABC):
 #         ...
         
         
-def trader_action(method):
-    @wraps(method)
-    def wrapper(self, *args, **kwargs):
-        if self.trader is not None:
-            req = method(self, *args, **kwargs)
-            req_dict = dataclass_to_dict(req)
-            req_dict['strategy_id'] = self.strategy.id
-            self.strategy.svars[req.id] = dataclass_to_dict(req_dict)
-            return req_dict
-    return wrapper
 
 class OptionGroup(ABC):
     def __init__(self, strategy):
@@ -170,29 +163,23 @@ class OptionGroup(ABC):
     def add_options(self, option):
         self.options.append(option)
     
-    @trader_action
-    def long_open(self, *args, **kwargs):
-        return self.trader.long_open(*args, **kwargs)
+    def long_open(self, symbol, amount, price, extra_info=None):
+        return self.trader.long_open(self.strategy, symbol, amount, price, extra_info)
         
-    @trader_action
-    def long_close(self, *args, **kwargs):
-        return self.trader.long_close(*args, **kwargs)
+    def long_close(self, symbol, amount, price, extra_info=None):
+        return self.trader.long_close(self.strategy, symbol, amount, price, extra_info)
         
-    @trader_action
-    def short_open(self, *args, **kwargs):
-        return self.trader.short_open(*args, **kwargs)
+    def short_open(self, symbol, amount, price, extra_info=None):
+        return self.trader.short_open(self.strategy, symbol, amount, price, extra_info)
         
-    @trader_action
-    def short_close(self, *args, **kwargs):
-        return self.trader.short_close(*args, **kwargs)
+    def short_close(self, symbol, amount, price, extra_info=None):
+        return self.trader.short_close(self.strategy, symbol, amount, price, extra_info)
             
-    @trader_action
     def combinate(self, *args, **kwargs):
-        return self.trader.combinate(*args, **kwargs)
+        return self.trader.combinate(self.strategy, *args, **kwargs)
 
-    @trader_action
     def release(self, *args, **kwargs):
-        return self.trader.release(*args, **kwargs)
+        return self.trader.release(self.strategy, *args, **kwargs)
     
     @abstractmethod
     def on_bars(self, bars):

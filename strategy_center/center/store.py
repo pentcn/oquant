@@ -61,6 +61,11 @@ class MongoDBManager:
         return list(collection.find(query))
 
     @_auto_reconnect
+    def find_one(self, collection_name, query={}):
+        collection = self.db[collection_name]
+        return collection.find_one(query)
+
+    @_auto_reconnect
     def update_data(self, collection_name, query, update_values):
         """更新指定集合中符合条件的数据"""
         collection = self.db[collection_name]
@@ -107,3 +112,6 @@ class StrategyVars(MongoDBManager):
         
         self.insert_data(self.collection_name, doc)
         
+    def __getitem__(self, key):
+        cond = {'uuid': key}
+        return self.find_one(self.collection_name, cond)
