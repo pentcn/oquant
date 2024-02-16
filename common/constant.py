@@ -23,7 +23,10 @@ class Request:
     code: str
     amount: int = 0
     amount2: int = 0
+    price: float = 0.0
+    price2: float = 0.0
     id: str = None
+    
     def __post_init__(self):
         if self.id is None:
             self.id = str(uuid4())
