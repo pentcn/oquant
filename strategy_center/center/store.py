@@ -82,6 +82,7 @@ class MongoDBManager:
         collection = self.db[collection_name]
         doc = collection.find_one(query)
         return True if doc else False
+    
 
     def close_connection(self):
         """关闭 MongoDB 连接"""
@@ -115,6 +116,14 @@ class StrategyVars(MongoDBManager):
     def __getitem__(self, key):
         cond = {'uuid': key}
         return self.find_one(self.collection_name, cond)
+    
+    def clear(self, strategy_id):
+        cond = {
+            "body": {
+                "$regex": f'.*"strategy_id": "{strategy_id}".*'
+            }
+        }
+        self.delete_data(self.collection_name, cond)
 
 
 class StrategyTrades(MongoDBManager):
@@ -125,3 +134,20 @@ class StrategyTrades(MongoDBManager):
     
     def save(self, trade_info):
         self.insert_data(self.collection_name, trade_info)
+        
+    def clear(self, strategy_id):
+        cond = {'strategy_id': strategy_id}
+        self.delete_data(self.collection_name, cond)
+        
+class StrategyHoldings(MongoDBManager):
+    
+    def __init__(self,account_id,  db_name='oquant_runtime', host='127.0.0.1'):
+        super().__init__(db_name, host)
+        self.collection_name = f'{account_id}:holdings'
+    
+    def save(self, trade_info):
+        self.insert_data(self.collection_name, trade_info)
+        
+    def clear(self, strategy_id):
+        cond = {'strategy_id': strategy_id}
+        self.delete_data(self.collection_name, cond)        

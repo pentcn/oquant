@@ -1,14 +1,19 @@
 import pandas as pd
-from functools import wraps
 from abc import ABC, abstractmethod
+from common.constant import RunMode
 
-from strategy_center.center.store import StrategyVars
-
+from strategy_center.center.store import (
+    StrategyVars,
+    StrategyTrades, 
+    StrategyHoldings
+)
 class BaseEngine(ABC):
     
-    def __init__(self):
+    def __init__(self, run_mode=RunMode.BACKTEST):
+        self.run_mode = run_mode
         self.data_feed = None
         self.strategy_list = []
+
     
     def add_data_feed(self, data_feed):
         self.data_feed = data_feed
@@ -21,10 +26,12 @@ class BaseEngine(ABC):
         
         strategy.engine = self   
         self.strategy_list.append(strategy)     
-        # count = len(self.strategy_list) + 1
-        # self.strategy_list[count] = strategy        
         self.data_feed.add_symbol(strategy.underlying_symbol)
-        # return count
+        
+        if self.run_mode == RunMode.BACKTEST:
+            strategy.svars.clear(strategy.id)
+            strategy.trades.clear(strategy.id)
+            strategy.holdings.clear(strategy.id)
 
     def remove_strategy(self, strategy_id):
         del self.strategy_list[strategy_id]
@@ -39,10 +46,6 @@ class BaseEngine(ABC):
         
     @abstractmethod
     def dispatch_bars(self, bar):
-        ...
-    
-    @abstractmethod
-    def reset_strategies(self):
         ...
    
     
@@ -82,6 +85,8 @@ class BaseStrategy(ABC):
         self.trader = trader
         
         self.svars = StrategyVars(host=store_host)
+        self.trades = StrategyTrades(account_id, host=store_host)
+        self.holdings = StrategyHoldings(account_id, host=store_host)
 
     def set_contracts(self, contracts):
         self.contracts = contracts

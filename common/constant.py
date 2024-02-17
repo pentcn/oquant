@@ -2,7 +2,10 @@ from dataclasses import dataclass
 from uuid import uuid4
 from enum import Enum
 
-
+class RunMode(Enum):
+    BACKTEST = "backtest"
+    REALTIME = "realtime"
+    
 class Direction(Enum):
     LONG = "买"
     SHORT = "卖"

@@ -1,12 +1,11 @@
 from datetime import datetime
 from center.base import BaseStrategy
-from strategy_center.center.store import StrategyTrades
+
 
 class OptionStrategy(BaseStrategy):
     
     def __init__(self, id, account_id, name, underlying_symbol, trader, store_host, **kwargs):
         super().__init__(id, account_id, name, underlying_symbol, trader, store_host, **kwargs)
-        self.trades = StrategyTrades(account_id, host=store_host)
     
     def start(self):
         print("OptionEngine start")

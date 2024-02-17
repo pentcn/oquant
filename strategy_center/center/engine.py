@@ -39,7 +39,7 @@ class OptionEngine(BaseEngine):
     def end(self):
         print('todo')
     
-    def reset_strategies(self):
+    def save_holdings(self):
         print('todo')
     
     

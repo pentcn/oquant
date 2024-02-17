@@ -45,7 +45,7 @@ class WindETFOptionFileData(OptionsDataFeed):
             all_df = self._read_daily_data(active_date)
             self._send_all_bar(all_df)
             
-            self.engine.reset_strategies()
+            self.engine.save_holdings ()
             active_date += timedelta(days=1)   
                  
         
