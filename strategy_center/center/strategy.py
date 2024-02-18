@@ -28,4 +28,5 @@ class OptionStrategy(BaseStrategy):
             body['date'] = dt.strftime('%Y-%m-%d')
             body['time'] = dt.strftime('%H:%M:%S')
         self.trades.save(body)
+        self.holdings.update(self.id, body)
         ...

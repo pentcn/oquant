@@ -63,8 +63,8 @@ class MessageQueueSender:
             self.channel.basic_publish(exchange='',
                                        routing_key=queue_name,
                                        body=json_str)
-            print(datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'))
-            print(f" [x] Response '{json_str}'")
+            # print(datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'))
+            # print(f" [x] Response '{json_str}'")
         except pika.exceptions.ConnectionClosedByBroker:
             print("Connection closed by broker, trying to reconnect...")
             self.connection = None  # 重置连接

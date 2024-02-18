@@ -79,7 +79,6 @@ class BaseStrategy(ABC):
         self.underlying_symbol = underlying_symbol
         self.params = kwargs
         self.state = None
-        self.holdings = None
         self.minutes_bars = None
         self.engine = None
         self.trader = trader
@@ -165,11 +164,11 @@ class OptionGroup(ABC):
     def short_close(self, symbol, amount, price, extra_info=None):
         return self.trader.short_close(self.strategy, symbol, amount, price, extra_info)
             
-    def combinate(self, *args, **kwargs):
-        return self.trader.combinate(self.strategy, *args, **kwargs)
+    def combinate(self, symbol_1, amount_1, symbol_2, amount_2, extra_info=None):
+        return self.trader.combinate(self.strategy, symbol_1, amount_1, symbol_2, amount_2, extra_info)
 
-    def release(self, *args, **kwargs):
-        return self.trader.release(self.strategy, *args, **kwargs)
+    def release(self, combination_id, extra_info=None):
+        return self.trader.release(self.strategy, combination_id, extra_info)
     
     @abstractmethod
     def on_bars(self, bars):

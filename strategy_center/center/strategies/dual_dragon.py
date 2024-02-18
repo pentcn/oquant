@@ -22,7 +22,16 @@ class DualDragon(OptionStrategy):
             symbol = self.data_feed.get_option_symbol(self.underlying_symbol, undl_bar['close'], month_type, '购', 3)
             bar = self.data_feed.get_option_bar(self.underlying_symbol, symbol, undl_bar['datetime'])
 
-            self.day_group.short_open(symbol, 1, bar['close'])
+            self.day_group.long_open(symbol, 5, bar['close'])
+            self.day_group.short_open(symbol, 5, bar['close'])
+            self.day_group.short_open(symbol, 3, bar['close'] - 0.002)
+            self.day_group.long_close(symbol, 7, bar['close'] - 0.005)
+            self.day_group.long_open(symbol, 3, bar['close'] - 0.002)
+            self.day_group.short_close(symbol, 7, bar['close'] - 0.005)
+            
+            self.day_group.combinate(symbol, 1, symbol, -1)
+            self.day_group.release('test')
+            ...
 
         
     def on_trade_response(self, body):
