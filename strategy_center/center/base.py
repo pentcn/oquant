@@ -35,6 +35,11 @@ class BaseEngine(ABC):
 
     def remove_strategy(self, strategy_id):
         del self.strategy_list[strategy_id]
+    
+    def reset_strategies(self):
+        for strategy in self.strategy_list:
+            strategy.reset()
+
         
     @abstractmethod
     def start(self):
@@ -118,6 +123,9 @@ class BaseStrategy(ABC):
     def stop(self):
         ...
     
+    @abstractmethod
+    def reset(self):
+        ...
 
 class BaseTrader(ABC):
     

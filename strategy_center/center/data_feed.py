@@ -4,12 +4,13 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from abc import abstractmethod
 from center.base import BaseDataFeed
+from common.constant import RunMode
 
 
 class OptionsDataFeed(BaseDataFeed):
     def __init__(self):
         super().__init__()
-        self.contracts = {}
+        self.contracts_info = {}
         self.contracts_data = {}
     
     @abstractmethod
@@ -42,15 +43,20 @@ class WindETFOptionFileData(OptionsDataFeed):
     def run(self):
         active_date = self.start_date
         while active_date <= self.end_date:
-            all_df = self._read_daily_data(active_date)
-            self._send_all_bar(all_df)
-            
-            self.engine.save_holdings ()
+            self.contracts_data = self._read_daily_data(active_date)
+            self._send_all_bar()
+
             active_date += timedelta(days=1)   
+            
+            if self.engine.run_mode == RunMode.BACKTEST:
+                self.reset_symbols()
+                print('Todo: 保存groups')
+                self.engine.reset_strategies()
+
                  
         
     def get_option_symbol(self, underly_symbol, base_price, month_type, op_type, rank, has_appendix=False):
-        df = self.contracts[underly_symbol]
+        df = self.contracts_info[underly_symbol]
         month = sorted(list(set(list(df['month'].astype(int).values))))[month_type]
         df = df.loc[df['month']==str(month)]
         df = df.loc[df['option_type']==op_type]
@@ -80,7 +86,7 @@ class WindETFOptionFileData(OptionsDataFeed):
     def get_option_bar(self, underly_symbol, option_symbol, datetime):
         if option_symbol not in self.contracts_data:
             self.add_symbol(option_symbol)
-            df = self.contracts[underly_symbol]
+            df = self.contracts_info[underly_symbol]
             data_path = df.loc[df['code']==option_symbol]['remark'].values[0]
             data = pd.read_csv(data_path)
             self.contracts_data[option_symbol] = data
@@ -112,7 +118,7 @@ class WindETFOptionFileData(OptionsDataFeed):
                 continue
             data_df = self._add_contract(contract_path)
             if data_df is not None:
-                self.contracts[self.etf_symbols[i]] = data_df
+                self.contracts_info[self.etf_symbols[i]] = data_df
         
         return all_df
               
@@ -157,7 +163,8 @@ class WindETFOptionFileData(OptionsDataFeed):
                                     })
         return pd.DataFrame(contracts) if len(contracts) > 0 else None
             
-    def _send_all_bar(self, data_df):   
+    def _send_all_bar(self):   
+        data_df = self.contracts_data
         if len(data_df) == 0:
             return
         
@@ -168,6 +175,12 @@ class WindETFOptionFileData(OptionsDataFeed):
         base_name = list(base_df.keys())[0]
         for idx, row in base_df[base_name].iterrows():
             all_bar[base_name] = self._convert_to_dict(row)
+            
+            # 在交易中交易了新的合约，后续需要发送新合约的bar
+            new_contracts = [code for code in self.contract_symbols if not code in other_df]
+            for contract in new_contracts:
+                other_df[contract] = self.contracts_data[contract]
+                
             for name, df in other_df.items():
                 bar_data = df.loc[df['datetime']==row['datetime']]
                 if not bar_data.empty:
@@ -193,4 +206,8 @@ class WindETFOptionFileData(OptionsDataFeed):
             })
         
         return bar
+    
+    def reset_symbols(self):
+        self.symbols = self.etf_symbols.copy()
+        self.contract_symbols = []
         

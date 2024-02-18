@@ -7,14 +7,14 @@ class OptionEngine(BaseEngine):
         super().__init__()
         
     def dispatch_bars(self, all_bars):
-        print('todo')
         bar_symbols = all_bars.keys()
         for strategy in self.strategy_list:
-            symbols = [strategy.underlying_symbol] + strategy.get_holdings_symbols()
+            symbols = [strategy.underlying_symbol] + strategy.day_contracts
             sub_bars = {symbol: all_bars[symbol] for symbol in symbols if symbol in bar_symbols}
             if len(sub_bars) > 0:
                 # try:
                     strategy.on_bars(sub_bars)
+                    ...
                 # except Exception as e:
                 #     print(f'策略运行错误：{e}', e)
         
@@ -38,8 +38,4 @@ class OptionEngine(BaseEngine):
         
     def end(self):
         print('todo')
-    
-    def save_holdings(self):
-        print('todo')
-    
     

@@ -6,6 +6,7 @@ class OptionStrategy(BaseStrategy):
     
     def __init__(self, id, account_id, name, underlying_symbol, trader, store_host, **kwargs):
         super().__init__(id, account_id, name, underlying_symbol, trader, store_host, **kwargs)
+        self.day_contracts = []
     
     def start(self):
         print("OptionEngine start")
@@ -15,11 +16,6 @@ class OptionStrategy(BaseStrategy):
     
     def on_bars(self, bars):
         super().on_bars(bars)
-        
-    def get_holdings_symbols(self):
-        symbols = []
-        print("OptionEngine get_option_symbol")
-        return symbols
     
     def on_trade_response(self, body):
         if self.minutes_bars is not None:
@@ -30,3 +26,6 @@ class OptionStrategy(BaseStrategy):
         self.trades.save(body)
         self.holdings.update(self.id, body)
         ...
+        
+    def reset(self):
+        self.day_contracts = []    

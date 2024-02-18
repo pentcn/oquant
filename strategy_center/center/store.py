@@ -183,7 +183,6 @@ class StrategyHoldings(MongoDBManager):
     def update_combinations(self, combinations, new_trade_info):
         if new_trade_info['offset'] == Offset.RELEASE.value:
             combinations = [comb for comb in combinations if comb['id'] != new_trade_info['code']]
-            
         else:
             combinations.append({
                 'date': new_trade_info['date'],

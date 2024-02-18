@@ -55,8 +55,11 @@ class OptionTrader(BaseTrader):
             
     @mq_trade
     def long_open(self, strategy, symbol, amount, price, extra_info):
+        strategy.day_contracts.append(symbol)
+        strategy.day_contracts = list(set(strategy.day_contracts))
+        
         parts = symbol.split('.')
-        code, exchange = parts[0], parts[1]
+        code, exchange = parts[0], parts[1]        
         return strategy, extra_info, Request(direction=Direction.LONG, 
                      offset=Offset.OPEN, 
                      exchange=exchange, 
@@ -76,6 +79,9 @@ class OptionTrader(BaseTrader):
 
     @mq_trade  
     def short_open(self, strategy, symbol, amount, price, extra_info):
+        strategy.day_contracts.append(symbol)
+        strategy.day_contracts = list(set(strategy.day_contracts))
+        
         parts = symbol.split('.')
         code, exchange = parts[0], parts[1]
         return strategy, extra_info, Request(direction=Direction.SHORT, 
