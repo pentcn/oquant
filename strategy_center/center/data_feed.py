@@ -45,13 +45,13 @@ class WindETFOptionFileData(OptionsDataFeed):
         while active_date <= self.end_date:
             self.contracts_data = self._read_daily_data(active_date)
             self._send_all_bar()
-
-            active_date += timedelta(days=1)   
             
             if self.engine.run_mode == RunMode.BACKTEST:
                 self.reset_symbols()
-                print('Todo: 保存groups')
+                self.engine.save_groups()
                 self.engine.reset_strategies()
+                
+            active_date += timedelta(days=1)  
 
                  
         

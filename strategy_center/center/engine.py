@@ -33,6 +33,10 @@ class OptionEngine(BaseEngine):
                 strategy.on_trade_response(body)
                 break
             
+    def save_groups(self):
+        for strategy in self.strategy_list:
+            strategy.save_groups()
+            
     def start(self):
         self.data_feed.run()
         

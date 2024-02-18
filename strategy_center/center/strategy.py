@@ -29,3 +29,6 @@ class OptionStrategy(BaseStrategy):
         
     def reset(self):
         self.day_contracts = []    
+        
+    def save_groups(self):
+        ...
