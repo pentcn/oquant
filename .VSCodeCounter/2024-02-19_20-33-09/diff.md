@@ -1,27 +1,26 @@
 # Diff Summary
 
-Date : 2024-02-17 23:53:11
+Date : 2024-02-19 20:33:09
 
 Directory d:\\My Workspaces\\2024\\oquant
 
-Total : 3 files,  95 codes, 2 comments, 6 blanks, all 103 lines
+Total : 5 files,  57 codes, 0 comments, 2 blanks, all 59 lines
 
 [Summary](results.md) / [Details](details.md) / Diff Summary / [Diff Details](diff-details.md)
 
 ## Languages
 | language | files | code | comment | blank | total |
 | :--- | ---: | ---: | ---: | ---: | ---: |
-| Python | 2 | 74 | 2 | 6 | 82 |
-| JSON | 1 | 21 | 0 | 0 | 21 |
+| Python | 3 | 37 | 0 | 2 | 39 |
+| JSON | 2 | 20 | 0 | 0 | 20 |
 
 ## Directories
 | path | files | code | comment | blank | total |
 | :--- | ---: | ---: | ---: | ---: | ---: |
-| . | 3 | 95 | 2 | 6 | 103 |
-| strategy_center | 2 | 74 | 2 | 6 | 82 |
-| strategy_center\\center | 2 | 74 | 2 | 6 | 82 |
-| strategy_center\\center (Files) | 1 | 72 | -1 | 5 | 76 |
-| strategy_center\\center\\strategies | 1 | 2 | 3 | 1 | 6 |
-| test | 1 | 21 | 0 | 0 | 21 |
+| . | 5 | 57 | 0 | 2 | 59 |
+| common | 1 | -7 | 0 | 0 | -7 |
+| strategy_center | 3 | 37 | 0 | 2 | 39 |
+| strategy_center\\center | 3 | 37 | 0 | 2 | 39 |
+| test | 1 | 27 | 0 | 0 | 27 |
 
 [Summary](results.md) / [Details](details.md) / Diff Summary / [Diff Details](diff-details.md)

@@ -11,7 +11,7 @@ class DualDragonCombinations(OptionGroup):
     def on_bars(self, bars):
         print("DualDragonCombinations on_bars")
 
-    def long_open(self, symbol, amount, price):
+    def long_open(self, symbol, amount, price):        
         return super().long_open(symbol, amount, price, 
                                   {'is_dairy_task': 1 if self.is_dairy_task else 0})
 

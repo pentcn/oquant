@@ -5,7 +5,8 @@ from center.strategies.dual_dragon import DualDragon
 from center.trader import BacktestOptionTrader
 
 base_dir = r'D:\My Workspaces\2023\ETFOptions\data\options\wind'
-start_date = date(2020, 6, 17)
+start_date = date(2020, 10, 19)
+end_date = date(2020, 10, 19)
 store_host = '127.0.0.1'
 mq_params = {
     'user_name': 'test',
@@ -16,7 +17,7 @@ mq_params = {
 }
 
 if __name__ == '__main__':
-    data_feed = WindETFOptionFileData(base_dir, start_date)
+    data_feed = WindETFOptionFileData(base_dir, start_date, end_date)
     trader = BacktestOptionTrader(store_host, data_feed, mq_params)
     strategy_50etf_option = DualDragon('1', mq_params['account_id'], 'str_50etf_option', '510050.SH', trader, store_host) 
     strategy_300etf_option = DualDragon('2', mq_params['account_id'], 'str_300etf_option', '510300.SH', trader, store_host)

@@ -1,11 +1,14 @@
 import pandas as pd
 from abc import ABC, abstractmethod
+from uuid import uuid4
 from common.constant import RunMode
+from common.calendar import ChinaMarketCalendar
 
 from strategy_center.center.store import (
     StrategyVars,
     StrategyTrades, 
-    StrategyHoldings
+    StrategyHoldings,
+    StrategyGroups
 )
 class BaseEngine(ABC):
     
@@ -32,6 +35,7 @@ class BaseEngine(ABC):
             strategy.svars.clear(strategy.id)
             strategy.trades.clear(strategy.id)
             strategy.holdings.clear(strategy.id)
+            strategy.groups.clear(strategy.id)
 
     def remove_strategy(self, strategy_id):
         del self.strategy_list[strategy_id]
@@ -76,6 +80,7 @@ class BaseDataFeed(ABC):
        
         
 class BaseStrategy(ABC):
+    calendar = None
     
     def __init__(self, id, account_id, name, underlying_symbol, trader, store_host, **kwargs):
         self.id = id
@@ -91,6 +96,11 @@ class BaseStrategy(ABC):
         self.svars = StrategyVars(host=store_host)
         self.trades = StrategyTrades(account_id, host=store_host)
         self.holdings = StrategyHoldings(account_id, host=store_host)
+        self.groups = StrategyGroups(account_id, host=store_host)
+        self.last_trade_date = None
+        
+        if BaseStrategy.calendar is None:
+            BaseStrategy.calendar = ChinaMarketCalendar()
 
     def set_contracts(self, contracts):
         self.contracts = contracts
@@ -110,6 +120,9 @@ class BaseStrategy(ABC):
             self.minutes_bars = pd.DataFrame([bars[self.underlying_symbol]]) 
         else:
             self.minutes_bars.loc[len(self.minutes_bars)] = bars[self.underlying_symbol]
+        
+        if len(bars) > 0:
+            self.last_trade_date = BaseStrategy.calendar.get_last_traded_date(bars[self.underlying_symbol]['datetime'])
     
     @abstractmethod
     def on_trade_response(self, body):
@@ -151,31 +164,71 @@ class BaseTrader(ABC):
 
 class OptionGroup(ABC):
     def __init__(self, strategy):
+        self.id = None
         self.options = []
         self.strategy = strategy
         self.create_time = None
         self.destroy_time = None
         self.trader = strategy.trader
         
+    def create_id(self):
+        self.id = str(uuid4())
+        
     def add_options(self, option):
         self.options.append(option)
     
     def long_open(self, symbol, amount, price, extra_info=None):
+        if extra_info is None:
+            extra_info = {
+                'group_id': self.id,
+            }
+        else:
+            extra_info['group_id'] = self.id
         return self.trader.long_open(self.strategy, symbol, amount, price, extra_info)
         
     def long_close(self, symbol, amount, price, extra_info=None):
+        if extra_info is None:
+            extra_info = {
+                'group_id': self.id,
+            }
+        else:
+            extra_info['group_id'] = self.id
         return self.trader.long_close(self.strategy, symbol, amount, price, extra_info)
         
     def short_open(self, symbol, amount, price, extra_info=None):
+        if extra_info is None:
+            extra_info = {
+                'group_id': self.id,
+            }
+        else:
+            extra_info['group_id'] = self.id
         return self.trader.short_open(self.strategy, symbol, amount, price, extra_info)
         
     def short_close(self, symbol, amount, price, extra_info=None):
+        if extra_info is None:
+            extra_info = {
+                'group_id': self.id,
+            }
+        else:
+            extra_info['group_id'] = self.id
         return self.trader.short_close(self.strategy, symbol, amount, price, extra_info)
             
     def combinate(self, symbol_1, amount_1, symbol_2, amount_2, extra_info=None):
+        if extra_info is None:
+            extra_info = {
+                'group_id': self.id,
+            }
+        else:
+            extra_info['group_id'] = self.id
         return self.trader.combinate(self.strategy, symbol_1, amount_1, symbol_2, amount_2, extra_info)
 
     def release(self, combination_id, extra_info=None):
+        if extra_info is None:
+            extra_info = {
+                'group_id': self.id,
+            }
+        else:
+            extra_info['group_id'] = self.id
         return self.trader.release(self.strategy, combination_id, extra_info)
     
     @abstractmethod

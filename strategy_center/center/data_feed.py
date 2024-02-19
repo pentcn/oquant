@@ -47,8 +47,7 @@ class WindETFOptionFileData(OptionsDataFeed):
             self._send_all_bar()
             
             if self.engine.run_mode == RunMode.BACKTEST:
-                self.reset_symbols()
-                self.engine.save_groups()
+                self.reset_symbols()                
                 self.engine.reset_strategies()
                 
             active_date += timedelta(days=1)  

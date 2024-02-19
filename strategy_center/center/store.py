@@ -145,6 +145,29 @@ class StrategyTrades(MongoDBManager):
     def clear(self, strategy_id):
         cond = {'strategy_id': strategy_id}
         self.delete_data(self.collection_name, cond)
+
+
+class StrategyGroups(MongoDBManager):
+    
+    def __init__(self,account_id,  db_name='oquant_runtime', host='127.0.0.1'):
+        super().__init__(db_name, host)
+        self.collection_name = f'{account_id}:groups'
+    
+    def __getitem__(self, group_id):
+        query = {'group_id': group_id}
+        return self.find_one(self.collection_name, query)
+    
+    def add(self, groups_info):
+        self.insert_data(self.collection_name, groups_info)
+        
+    def update(self, groups_info):
+        self.update_data(self.collection_name, {'group_id': groups_info['group_id']}, groups_info)
+        
+    def clear(self, strategy_id):
+        cond = {'strategy_id': strategy_id}
+        self.delete_data(self.collection_name, cond)
+
+
         
 class StrategyHoldings(MongoDBManager):
     
