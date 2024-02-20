@@ -13,7 +13,8 @@ class OptionStrategy(BaseStrategy):
         print("OptionEngine start")
     
     def stop(self):
-        print("OptionEngine stop")
+        if self.trader.response_mq is not None:
+            self.trader.response_mq.stop()
     
     def on_bars(self, bars):
         super().on_bars(bars)

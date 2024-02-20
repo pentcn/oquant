@@ -6,6 +6,7 @@ class RunMode(Enum):
     BACKTEST = "backtest"
     REALTIME = "realtime"
     
+    
 class Direction(Enum):
     LONG = "买"
     SHORT = "卖"

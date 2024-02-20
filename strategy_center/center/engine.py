@@ -37,5 +37,6 @@ class OptionEngine(BaseEngine):
         self.data_feed.run()
         
     def end(self):
-        print('todo')
+        for strategy in self.strategy_list:
+            strategy.stop()
     

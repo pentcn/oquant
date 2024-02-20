@@ -1,25 +1,23 @@
 # Diff Summary
 
-Date : 2024-02-18 18:38:53
+Date : 2024-02-20 10:18:17
 
 Directory d:\\My Workspaces\\2024\\oquant
 
-Total : 4 files,  7 codes, 2 comments, 0 blanks, all 9 lines
+Total : 1 files,  23 codes, 0 comments, 1 blanks, all 24 lines
 
 [Summary](results.md) / [Details](details.md) / Diff Summary / [Diff Details](diff-details.md)
 
 ## Languages
 | language | files | code | comment | blank | total |
 | :--- | ---: | ---: | ---: | ---: | ---: |
-| Python | 4 | 7 | 2 | 0 | 9 |
+| Python | 1 | 23 | 0 | 1 | 24 |
 
 ## Directories
 | path | files | code | comment | blank | total |
 | :--- | ---: | ---: | ---: | ---: | ---: |
-| . | 4 | 7 | 2 | 0 | 9 |
-| strategy_center | 4 | 7 | 2 | 0 | 9 |
-| strategy_center\\center | 4 | 7 | 2 | 0 | 9 |
-| strategy_center\\center (Files) | 3 | 4 | 2 | 0 | 6 |
-| strategy_center\\center\\strategies | 1 | 3 | 0 | 0 | 3 |
+| . | 1 | 23 | 0 | 1 | 24 |
+| strategy_center | 1 | 23 | 0 | 1 | 24 |
+| strategy_center\\center | 1 | 23 | 0 | 1 | 24 |
 
 [Summary](results.md) / [Details](details.md) / Diff Summary / [Diff Details](diff-details.md)

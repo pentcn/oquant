@@ -42,6 +42,4 @@ class DualDragon(OptionStrategy):
     def run(self):
         ...
     
-    def stop(self):
-        ...
         

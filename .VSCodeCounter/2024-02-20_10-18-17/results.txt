@@ -1,0 +1,56 @@
+Date : 2024-02-20 10:18:17
+Directory : d:\My Workspaces\2024\oquant
+Total : 20 files,  10363 codes, 29 comments, 311 blanks, all 10703 lines
+
+Languages
++----------+------------+------------+------------+------------+------------+
+| language | files      | code       | comment    | blank      | total      |
++----------+------------+------------+------------+------------+------------+
+| CSV      |          1 |      8,313 |          0 |          1 |      8,314 |
+| Python   |         14 |      1,209 |         29 |        273 |      1,511 |
+| JSON     |          3 |        522 |          0 |          3 |        525 |
+| Draw.io  |          1 |        260 |          0 |          0 |        260 |
+| Markdown |          1 |         59 |          0 |         34 |         93 |
++----------+------------+------------+------------+------------+------------+
+
+Directories
++-------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                          | files      | code       | comment    | blank      | total      |
++-------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                             |         20 |     10,363 |         29 |        311 |     10,703 |
+| . (Files)                                                                     |          2 |        319 |          0 |         34 |        353 |
+| common                                                                        |          5 |      8,490 |          5 |         28 |      8,523 |
+| strategy_center                                                               |         10 |      1,061 |         18 |        238 |      1,317 |
+| strategy_center (Files)                                                       |          1 |         26 |          1 |          4 |         31 |
+| strategy_center\center                                                        |          9 |      1,035 |         17 |        234 |      1,286 |
+| strategy_center\center (Files)                                                |          8 |        999 |         17 |        222 |      1,238 |
+| strategy_center\center\strategies                                             |          1 |         36 |          0 |         12 |         48 |
+| test                                                                          |          3 |        493 |          6 |         11 |        510 |
++-------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++-------------------------------------------------------------------------------+----------+------------+------------+------------+------------+
+| filename                                                                      | language | code       | comment    | blank      | total      |
++-------------------------------------------------------------------------------+----------+------------+------------+------------+------------+
+| d:\My Workspaces\2024\oquant\README.md                                        | Markdown |         59 |          0 |         34 |         93 |
+| d:\My Workspaces\2024\oquant\arch.drawio                                      | Draw.io  |        260 |          0 |          0 |        260 |
+| d:\My Workspaces\2024\oquant\common\calendar.csv                              | CSV      |      8,313 |          0 |          1 |      8,314 |
+| d:\My Workspaces\2024\oquant\common\calendar.py                               | Python   |         38 |          0 |          8 |         46 |
+| d:\My Workspaces\2024\oquant\common\constant.py                               | Python   |         31 |          0 |          7 |         38 |
+| d:\My Workspaces\2024\oquant\common\option_strategy.ipynb                     | JSON     |         83 |          0 |          1 |         84 |
+| d:\My Workspaces\2024\oquant\common\utilities.py                              | Python   |         25 |          5 |         11 |         41 |
+| d:\My Workspaces\2024\oquant\strategy_center\center\base.py                   | Python   |        200 |          0 |         61 |        261 |
+| d:\My Workspaces\2024\oquant\strategy_center\center\data_feed.py              | Python   |        174 |          2 |         36 |        212 |
+| d:\My Workspaces\2024\oquant\strategy_center\center\engine.py                 | Python   |         21 |         10 |         11 |         42 |
+| d:\My Workspaces\2024\oquant\strategy_center\center\mq.py                     | Python   |        124 |          2 |         20 |        146 |
+| d:\My Workspaces\2024\oquant\strategy_center\center\option_group.py           | Python   |         15 |          0 |          8 |         23 |
+| d:\My Workspaces\2024\oquant\strategy_center\center\store.py                  | Python   |        232 |          1 |         48 |        281 |
+| d:\My Workspaces\2024\oquant\strategy_center\center\strategies\dual_dragon.py | Python   |         36 |          0 |         12 |         48 |
+| d:\My Workspaces\2024\oquant\strategy_center\center\strategy.py               | Python   |         83 |          0 |         14 |         97 |
+| d:\My Workspaces\2024\oquant\strategy_center\center\trader.py                 | Python   |        150 |          2 |         24 |        176 |
+| d:\My Workspaces\2024\oquant\strategy_center\main.py                          | Python   |         26 |          1 |          4 |         31 |
+| d:\My Workspaces\2024\oquant\test\mong.ipynb                                  | JSON     |        257 |          0 |          1 |        258 |
+| d:\My Workspaces\2024\oquant\test\mq.ipynb                                    | JSON     |        182 |          0 |          1 |        183 |
+| d:\My Workspaces\2024\oquant\test\test_mq.py                                  | Python   |         54 |          6 |          9 |         69 |
+| Total                                                                         |          |     10,363 |         29 |        311 |     10,703 |
++-------------------------------------------------------------------------------+----------+------------+------------+------------+------------+

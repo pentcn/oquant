@@ -138,7 +138,11 @@ class MessageQueueReceiver:
     def stop(self):
         self.should_reconnect = False
         if self.connection and self.connection.is_open:
-            self.connection.close()
+            try:
+                self.channel.stop_consuming()
+                self.connection.close()
+            except pika.exceptions.ConnectionClosed:
+                pass
 
         if self.consumer_thread:
             self.consumer_thread.join()

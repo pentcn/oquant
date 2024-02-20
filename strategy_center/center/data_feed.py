@@ -50,7 +50,8 @@ class WindETFOptionFileData(OptionsDataFeed):
                 self.reset_symbols()                
                 self.engine.reset_strategies()
                 
-            active_date += timedelta(days=1)  
+            active_date += timedelta(days=1)
+        self.engine.end()  
 
                  
         
