@@ -182,11 +182,11 @@ class StrategyHoldings(MongoDBManager):
         cond = {'strategy_id': strategy_id}
         self.delete_data(self.collection_name, cond)        
         
-    def update(self, strategy_id, trade_info):
+    def update(self, strategy_id, trade_info, last_date=None):
         cond = {'date': trade_info['date'], 'strategy_id': strategy_id}
         old_holdings = self.find_one(self.collection_name, cond)
-        if old_holdings is None:
-            old_holdings = self.get_last_holdings(strategy_id)
+        if old_holdings is None:            
+            old_holdings = self.get_holdings(strategy_id, last_date)
             if old_holdings is None:
                 old_holdings = {
                     'strategy_id': strategy_id,
@@ -276,6 +276,7 @@ class StrategyHoldings(MongoDBManager):
             
         return positions
                          
-    def get_last_holdings(self, strategy_id):
-        print('todo: get_last_holdings')
-        return
+    def get_holdings(self, strategy_id, last_date):
+        _date = last_date.strftime('%Y-%m-%d')
+        holdings = self.find_data(self.collection_name, {'strategy_id': strategy_id, 'date': _date})
+        return holdings if holdings != [] else None

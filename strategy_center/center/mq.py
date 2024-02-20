@@ -141,6 +141,7 @@ class MessageQueueReceiver:
             try:
                 self.channel.stop_consuming()
                 self.connection.close()
+                time.sleep(1)  # 等待消费线程退出
             except pika.exceptions.ConnectionClosed:
                 pass
 

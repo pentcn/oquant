@@ -24,9 +24,10 @@ class OptionStrategy(BaseStrategy):
             active_time = self.minutes_bars.iloc[-1]['datetime']
             dt = datetime.strptime(active_time, '%Y-%m-%d %H:%M:%S')
             body['date'] = dt.strftime('%Y-%m-%d')
-            body['time'] = dt.strftime('%H:%M:%S')
+            body['time'] = dt.strftime('%H:%M:%S')        
         self.trades.save(body)
-        self.holdings.update(self.id, body.copy())
+        last_date = self.calendar.get_last_traded_date(body['date'])
+        self.holdings.update(self.id, body.copy(), last_date)
         self.update_groups(body.copy())
     
     def update_groups(self, trade_info):
