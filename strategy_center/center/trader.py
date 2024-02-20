@@ -20,7 +20,7 @@ def mq_trade(method):
         req_dict['strategy_id'] = strategy.id
         if extra_info and len(extra_info) > 0:
             req_dict.update(extra_info)
-        strategy.svars[req.id] = req_dict 
+        strategy.svars_store[req.id] = req_dict 
         self.mq.send(req)
         return req_dict
     return wrapper
@@ -123,7 +123,7 @@ class OptionTrader(BaseTrader):
     def on_response(self, message):
         obj = json.loads(message)
         if 'req_id' in obj:
-            body = self.svars[obj['req_id']]['body']
+            body = self.svars_store[obj['req_id']]['body']
             body = json.loads(body)
             body['remark'] = obj['remark']
             if self.data_feed is not None and self.data_feed.engine is not None:

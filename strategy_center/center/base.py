@@ -32,10 +32,10 @@ class BaseEngine(ABC):
         self.data_feed.add_symbol(strategy.underlying_symbol)
         
         if self.run_mode == RunMode.BACKTEST:
-            strategy.svars.clear(strategy.id)
-            strategy.trades.clear(strategy.id)
-            strategy.holdings.clear(strategy.id)
-            strategy.groups.clear(strategy.id)
+            strategy.svars_store.clear(strategy.id)
+            strategy.trades_store.clear(strategy.id)
+            strategy.holdings_store.clear(strategy.id)
+            strategy.groups_store.clear(strategy.id)
 
     def remove_strategy(self, strategy_id):
         del self.strategy_list[strategy_id]
@@ -91,12 +91,13 @@ class BaseStrategy(ABC):
         self.state = None
         self.minutes_bars = None
         self.engine = None
+        self.groups = []
         self.trader = trader
         
-        self.svars = StrategyVars(host=store_host)
-        self.trades = StrategyTrades(account_id, host=store_host)
-        self.holdings = StrategyHoldings(account_id, host=store_host)
-        self.groups = StrategyGroups(account_id, host=store_host)
+        self.svars_store = StrategyVars(host=store_host)
+        self.trades_store = StrategyTrades(account_id, host=store_host)
+        self.holdings_store = StrategyHoldings(account_id, host=store_host)
+        self.groups_store = StrategyGroups(account_id, host=store_host)
         self.last_trade_date = None
         
         if BaseStrategy.calendar is None:
@@ -143,7 +144,7 @@ class BaseStrategy(ABC):
 class BaseTrader(ABC):
     
     def __init__(self, store_host):
-        self.svars = StrategyVars(host=store_host)
+        self.svars_store = StrategyVars(host=store_host)
     
     @abstractmethod
     def long_open(self, symbol, amount, price):
@@ -236,25 +237,25 @@ class OptionGroup(ABC):
         pass
         
         
-class Trader(ABC):
+# class Trader(ABC):
     
-    def __init__(self):
-        ...
+#     def __init__(self):
+#         ...
     
-    @abstractmethod
-    def long_open(self, symbol, amount, price):
-        ...
+#     @abstractmethod
+#     def long_open(self, symbol, amount, price):
+#         ...
         
-    @abstractmethod
-    def long_close(self, symbol, amount, price):
-        ...
+#     @abstractmethod
+#     def long_close(self, symbol, amount, price):
+#         ...
         
-    @abstractmethod
-    def short_open(self, symbol, amount, price):
-        ...
+#     @abstractmethod
+#     def short_open(self, symbol, amount, price):
+#         ...
         
-    @abstractmethod
-    def short_close(self, symbol, amount, price):
-        ...
+#     @abstractmethod
+#     def short_close(self, symbol, amount, price):
+#         ...
         
         

@@ -162,7 +162,10 @@ class StrategyGroups(MongoDBManager):
         
     def update(self, groups_info):
         self.update_data(self.collection_name, {'group_id': groups_info['group_id']}, groups_info)
-        
+    
+    def delete(self, group_id):
+        self.delete_data(self.collection_name, {'group_id': group_id})
+    
     def clear(self, strategy_id):
         cond = {'strategy_id': strategy_id}
         self.delete_data(self.collection_name, cond)

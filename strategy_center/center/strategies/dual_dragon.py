@@ -26,9 +26,9 @@ class DualDragon(OptionStrategy):
             self.day_group.long_open(symbol, 5, bar['close'])
             self.day_group.short_open(symbol, 5, bar['close'])
             self.day_group.short_open(symbol, 3, bar['close'] * 0.8)
-            self.day_group.long_close(symbol, 7, bar['close'] * 0.5)
+            self.day_group.long_close(symbol, 8, bar['close'] * 0.5)
             self.day_group.long_open(symbol, 3, bar['close'] * 0.8)
-            self.day_group.short_close(symbol, 7, bar['close'] * 0.5)
+            self.day_group.short_close(symbol, 8, bar['close'] * 0.5)
             
             self.day_group.combinate(symbol, 1, symbol, -1)
             self.day_group.release('test')
@@ -41,5 +41,11 @@ class DualDragon(OptionStrategy):
          
     def run(self):
         ...
+        
+    def reset(self):
+        super().reset()
+        
+        self.day_group = DualDragonCombinations(self)
+        self.day_group.create_id()
     
         

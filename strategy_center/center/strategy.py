@@ -25,9 +25,9 @@ class OptionStrategy(BaseStrategy):
             dt = datetime.strptime(active_time, '%Y-%m-%d %H:%M:%S')
             body['date'] = dt.strftime('%Y-%m-%d')
             body['time'] = dt.strftime('%H:%M:%S')        
-        self.trades.save(body)
+        self.trades_store.save(body)
         last_date = self.calendar.get_last_traded_date(body['date'])
-        self.holdings.update(self.id, body.copy(), last_date)
+        self.holdings_store.update(self.id, body.copy(), last_date)
         self.update_groups(body.copy())
     
     def update_groups(self, trade_info):
@@ -38,7 +38,7 @@ class OptionStrategy(BaseStrategy):
                     'price': trade_info['price']
                 }
         group = None
-        old_group = self.groups[trade_info['group_id']]
+        old_group = self.groups_store[trade_info['group_id']]
         if old_group is None:
             if trade_info['offset'] == Offset.OPEN.value:
                 group = {
@@ -50,7 +50,7 @@ class OptionStrategy(BaseStrategy):
                     'positions':[info],
                     'combinations': []
                 }
-                self.groups.add(group)
+                self.groups_store.add(group)
         else:
             group = old_group
             positions = group['positions']
@@ -89,10 +89,21 @@ class OptionStrategy(BaseStrategy):
                 index = [idx for idx, comb in enumerate(combinations) if comb['comb_id'] == trade_info['code']]
                 if index != []:
                     del combinations[index[0]]
-                
-            self.groups.update(group)
+            
+            # 删除空仓
+            empty_position_index = [idx for idx, p in enumerate(group['positions']) if p['amount'] == 0]
+            if empty_position_index != []:
+                for i in range(len(empty_position_index)):
+                    del group['positions'][empty_position_index[i]]
+           
+            if group['positions'] == []: # 删除空分组
+                self.groups_store.delete(group['group_id'])
+            else:    
+                self.groups_store.update(group)
         
     def reset(self):
         self.day_contracts = []    
-    
+        
+        # 重置分组信息
+        # self.groups_store
            
