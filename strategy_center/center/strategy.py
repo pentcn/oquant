@@ -26,14 +26,18 @@ class OptionStrategy(BaseStrategy):
             body['date'] = dt.strftime('%Y-%m-%d')
             body['time'] = dt.strftime('%H:%M:%S')        
         self.trades_store.save(body)
+        
         last_date = self.calendar.get_last_traded_date(body['date'])
         self.holdings_store.update(self.id, body.copy(), last_date)
+        
         self.update_groups(body.copy())
     
     def update_groups(self, trade_info):
-        trade_info['amount'] = trade_info['amount'] * (1 if trade_info['direction'] == Direction.LONG.value else -1) 
+        if trade_info['direction'] in [Direction.LONG.value, Direction.SHORT.value]:
+            trade_info['amount'] = trade_info['amount'] * (1 if trade_info['direction'] == Direction.LONG.value else -1) 
         info  = {                 
                     'symbol': f'{trade_info["code"]}.{trade_info["exchange"]}',
+                    'name': trade_info['name'],
                     'amount': trade_info['amount'] ,
                     'price': trade_info['price']
                 }
@@ -103,7 +107,4 @@ class OptionStrategy(BaseStrategy):
         
     def reset(self):
         self.day_contracts = []    
-        
-        # 重置分组信息
-        # self.groups_store
            

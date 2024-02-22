@@ -1,15 +1,17 @@
 import pandas as pd
 from abc import ABC, abstractmethod
 from uuid import uuid4
-from common.constant import RunMode
-from common.calendar import ChinaMarketCalendar
 
+from common.calendar import ChinaMarketCalendar
+from common.constant import RunMode
 from strategy_center.center.store import (
     StrategyVars,
-    StrategyTrades, 
+    StrategyTrades,
     StrategyHoldings,
     StrategyGroups
 )
+
+
 class BaseEngine(ABC):
     
     def __init__(self, run_mode=RunMode.BACKTEST):
@@ -174,6 +176,9 @@ class OptionGroup(ABC):
         
     def create_id(self):
         self.id = str(uuid4())
+    
+    def set_id(self, group_id):
+        self.id = group_id
         
     def add_options(self, option):
         self.options.append(option)

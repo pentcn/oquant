@@ -25,6 +25,7 @@ class Request:
     offset: Offset
     exchange: str
     code: str
+    name: str = ''
     amount: int = 0
     amount2: int = 0
     price: float = 0.0

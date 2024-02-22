@@ -166,6 +166,10 @@ class StrategyGroups(MongoDBManager):
     def delete(self, group_id):
         self.delete_data(self.collection_name, {'group_id': group_id})
     
+    def get_all(self, strategy_id):
+        query = {'strategy_id': strategy_id}
+        return self.find_data(self.collection_name, query)
+    
     def clear(self, strategy_id):
         cond = {'strategy_id': strategy_id}
         self.delete_data(self.collection_name, cond)
@@ -237,6 +241,7 @@ class StrategyHoldings(MongoDBManager):
                     'direction': new_trade_info['direction'],
                     'offset': new_trade_info['offset'],
                     'symbol': symbol,
+                    'name':  new_trade_info['name'],
                     'amounts': [new_trade_info['amount'] * is_buy],
                     'prices': [new_trade_info['price']],
                     'profit': 0

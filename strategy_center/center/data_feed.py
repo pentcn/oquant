@@ -52,8 +52,6 @@ class WindETFOptionFileData(OptionsDataFeed):
                 
             active_date += timedelta(days=1)
         self.engine.end()  
-
-                 
         
     def get_option_symbol(self, underly_symbol, base_price, month_type, op_type, rank, has_appendix=False):
         df = self.contracts_info[underly_symbol]
@@ -83,6 +81,16 @@ class WindETFOptionFileData(OptionsDataFeed):
         
         return df['code'] if not df.empty else None
     
+    def get_option_name(self, symbol):
+        for _, df in self.contracts_info.items():
+            contract = df.loc[df['code']==symbol, 'remark']
+            if not contract.empty:
+                path = contract.values[0]
+                pattern = r'(\d{8}\.\w{2})-(\w+)'
+                match = re.match(pattern, Path(path).stem)
+                if match:
+                    return match[2]
+    
     def get_option_bar(self, underly_symbol, option_symbol, datetime):
         if option_symbol not in self.contracts_data:
             self.add_symbol(option_symbol)
@@ -94,6 +102,21 @@ class WindETFOptionFileData(OptionsDataFeed):
         df = self.contracts_data[option_symbol]
         return df.loc[df['datetime']==datetime].to_dict(orient='records')[0]
         ...
+    
+    def parse_contract_name(self, name):
+        pattern = r'(\w+)([沽购])(\d{4})?年?(\d{1,2})月(\d+)([A-Z]?)'
+        match = re.match(pattern, name)
+        if match:
+            udl_name, option_type, year, month, strike_price, appendix = match.groups() 
+            return {
+                'underly_name': udl_name,
+                'option_type': option_type,
+                'year': year,
+                'month': month,
+                'strike_price': strike_price,
+                'appendix': appendix
+            }    
+        
     
     def _read_daily_data(self, active_date):
         all_df = {}

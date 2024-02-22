@@ -58,22 +58,26 @@ class OptionTrader(BaseTrader):
         strategy.day_contracts.append(symbol)
         strategy.day_contracts = list(set(strategy.day_contracts))
         
+        name = self.data_feed.get_option_name(symbol)
         parts = symbol.split('.')
-        code, exchange = parts[0], parts[1]        
+        code, exchange = parts[0], parts[1]
         return strategy, extra_info, Request(direction=Direction.LONG, 
                      offset=Offset.OPEN, 
                      exchange=exchange, 
                      code=code, 
+                     name=name,
                      amount=amount,
                      price=price)
     @mq_trade
     def long_close(self, strategy, symbol, amount, price, extra_info):
+        name = self.data_feed.get_option_name(symbol)
         parts = symbol.split('.')
         code, exchange = parts[0], parts[1]
         return strategy, extra_info, Request(direction=Direction.LONG, 
                      offset=Offset.CLOSE, 
                      exchange=exchange, 
                      code=code, 
+                     name=name,
                      amount=amount,
                      price=price)
 
@@ -82,23 +86,27 @@ class OptionTrader(BaseTrader):
         strategy.day_contracts.append(symbol)
         strategy.day_contracts = list(set(strategy.day_contracts))
         
+        name = self.data_feed.get_option_name(symbol)
         parts = symbol.split('.')
         code, exchange = parts[0], parts[1]
         return strategy, extra_info, Request(direction=Direction.SHORT, 
                      offset=Offset.OPEN, 
                      exchange=exchange, 
                      code=code, 
+                     name=name,
                      amount=amount,
                      price=price)
 
     @mq_trade
     def short_close(self, strategy, symbol, amount, price, extra_info):
+        name = self.data_feed.get_option_name(symbol)
         parts = symbol.split('.')
         code, exchange = parts[0], parts[1]
         return strategy, extra_info, Request(direction=Direction.SHORT, 
                      offset=Offset.CLOSE, 
                      exchange=exchange, 
                      code=code, 
+                     name=name,
                      amount=amount,
                      price=price)
     
