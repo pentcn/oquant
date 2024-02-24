@@ -2,21 +2,27 @@ from datetime import datetime, time, timedelta
 from strategy_center.center.strategy import OptionStrategy
 from strategy_center.center.option_group import DualDragonCombinations
 from common.utilities import get_fourth_wednesday
+from common.constant import RunMode
 
 class DualDragon(OptionStrategy):
     def __init__(self, id, account_id, name, underlying_symbol, trader, store_host, exit_days=25):
         super().__init__(id, account_id, name, underlying_symbol, trader, store_host, exit_days=exit_days)        
-        self.day_group = DualDragonCombinations(self)
-        self.day_group.create_id()
-     
+        self.day_group = None
+             
     def load(self):
-        ...
+        print('Todo: load day_group')
     
-    def on_bars(self, bars):
+    def on_bars(self, bars):     
         super().on_bars(bars)
         
         undl_bar = bars[self.underlying_symbol]
         dt = datetime.strptime(undl_bar['datetime'], "%Y-%m-%d %H:%M:%S")
+        
+        if self.groups == []:
+            self.day_group = DualDragonCombinations(self)
+            self.day_group.create_id()
+            self.groups.append(self.day_group)
+        
         if dt.time() ==  time(9, 30):
             expired_date = get_fourth_wednesday(dt.year, dt.month)
             month_type = 1 if 0 <=(expired_date - dt.date()).days <= self.exit_days else 0
@@ -48,21 +54,23 @@ class DualDragon(OptionStrategy):
         # 建立双龙入海策略的当天交易组
         self.day_group = DualDragonCombinations(self)
         self.day_group.create_id()
-        
+    
+    
+    def reset_groups(self):    
         # 重置分组信息
         groups = self.groups_store.get_all(self.id)
         for group in groups:
             combination = DualDragonCombinations(self)
             combination.set_id(group['group_id'])
             
-            if group['combinations'] != []:
-                threshold_prices = self.get_threshold_prices(group['combinations'][0], group['positions'])
-            
+           
             
             
             
             self.groups.append(combination)
-    
-    def get_threshold_prices(self, comb_info, positions):
-        
-        ...    
+            
+    def add_group_extra_info(self, group):
+        if group['combinations'] != []:
+            ...
+        return group
+       

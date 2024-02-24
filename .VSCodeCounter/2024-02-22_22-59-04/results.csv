@@ -1,0 +1,30 @@
+"filename", "language", "XML", "pip requirements", "Markdown", "Python", "JSON", "Draw.io", "CSV", "comment", "blank", "total"
+"d:\My Workspaces\2024\oquant\.idea\inspectionProfiles\Project_Default.xml", "XML", 15, 0, 0, 0, 0, 0, 0, 0, 0, 15
+"d:\My Workspaces\2024\oquant\.idea\inspectionProfiles\profiles_settings.xml", "XML", 6, 0, 0, 0, 0, 0, 0, 0, 0, 6
+"d:\My Workspaces\2024\oquant\.idea\misc.xml", "XML", 7, 0, 0, 0, 0, 0, 0, 0, 0, 7
+"d:\My Workspaces\2024\oquant\.idea\modules.xml", "XML", 8, 0, 0, 0, 0, 0, 0, 0, 0, 8
+"d:\My Workspaces\2024\oquant\.idea\oquant.iml", "XML", 12, 0, 0, 0, 0, 0, 0, 0, 0, 12
+"d:\My Workspaces\2024\oquant\.idea\vcs.xml", "XML", 6, 0, 0, 0, 0, 0, 0, 0, 0, 6
+"d:\My Workspaces\2024\oquant\.idea\workspace.xml", "XML", 56, 0, 0, 0, 0, 0, 0, 0, 0, 56
+"d:\My Workspaces\2024\oquant\README.md", "Markdown", 0, 0, 59, 0, 0, 0, 0, 0, 34, 93
+"d:\My Workspaces\2024\oquant\arch.drawio", "Draw.io", 0, 0, 0, 0, 0, 257, 0, 0, 0, 257
+"d:\My Workspaces\2024\oquant\common\calendar.csv", "CSV", 0, 0, 0, 0, 0, 0, 8313, 0, 1, 8314
+"d:\My Workspaces\2024\oquant\common\calendar.py", "Python", 0, 0, 0, 38, 0, 0, 0, 0, 8, 46
+"d:\My Workspaces\2024\oquant\common\constant.py", "Python", 0, 0, 0, 32, 0, 0, 0, 0, 8, 40
+"d:\My Workspaces\2024\oquant\common\option_strategy.ipynb", "JSON", 0, 0, 0, 0, 83, 0, 0, 0, 1, 84
+"d:\My Workspaces\2024\oquant\common\utilities.py", "Python", 0, 0, 0, 25, 0, 0, 0, 5, 11, 41
+"d:\My Workspaces\2024\oquant\requirements.txt", "pip requirements", 0, 135, 0, 0, 0, 0, 0, 0, 0, 135
+"d:\My Workspaces\2024\oquant\strategy_center\center\base.py", "Python", 0, 0, 0, 188, 0, 0, 0, 15, 64, 267
+"d:\My Workspaces\2024\oquant\strategy_center\center\data_feed.py", "Python", 0, 0, 0, 197, 0, 0, 0, 2, 37, 236
+"d:\My Workspaces\2024\oquant\strategy_center\center\engine.py", "Python", 0, 0, 0, 22, 0, 0, 0, 10, 11, 43
+"d:\My Workspaces\2024\oquant\strategy_center\center\mq.py", "Python", 0, 0, 0, 129, 0, 0, 0, 2, 20, 151
+"d:\My Workspaces\2024\oquant\strategy_center\center\option_group.py", "Python", 0, 0, 0, 15, 0, 0, 0, 0, 8, 23
+"d:\My Workspaces\2024\oquant\strategy_center\center\store.py", "Python", 0, 0, 0, 239, 0, 0, 0, 1, 50, 290
+"d:\My Workspaces\2024\oquant\strategy_center\center\strategies\dual_dragon.py", "Python", 0, 0, 0, 47, 0, 0, 0, 2, 20, 69
+"d:\My Workspaces\2024\oquant\strategy_center\center\strategy.py", "Python", 0, 0, 0, 94, 0, 0, 0, 1, 16, 111
+"d:\My Workspaces\2024\oquant\strategy_center\center\trader.py", "Python", 0, 0, 0, 158, 0, 0, 0, 2, 24, 184
+"d:\My Workspaces\2024\oquant\strategy_center\main.py", "Python", 0, 0, 0, 26, 0, 0, 0, 1, 4, 31
+"d:\My Workspaces\2024\oquant\test\mong.ipynb", "JSON", 0, 0, 0, 0, 257, 0, 0, 0, 1, 258
+"d:\My Workspaces\2024\oquant\test\mq.ipynb", "JSON", 0, 0, 0, 0, 182, 0, 0, 0, 1, 183
+"d:\My Workspaces\2024\oquant\test\test_mq.py", "Python", 0, 0, 0, 54, 0, 0, 0, 6, 9, 69
+"Total", "-", 110, 135, 59, 1264, 522, 257, 8313, 47, 328, 11035

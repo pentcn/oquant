@@ -173,6 +173,8 @@ class StrategyGroups(MongoDBManager):
     def clear(self, strategy_id):
         cond = {'strategy_id': strategy_id}
         self.delete_data(self.collection_name, cond)
+        
+        
 
 
         

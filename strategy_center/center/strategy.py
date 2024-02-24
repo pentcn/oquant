@@ -8,6 +8,7 @@ class OptionStrategy(BaseStrategy):
     def __init__(self, id, account_id, name, underlying_symbol, trader, store_host, **kwargs):
         super().__init__(id, account_id, name, underlying_symbol, trader, store_host, **kwargs)
         self.day_contracts = []
+        self.groups = []
     
     def start(self):
         print("OptionEngine start")
@@ -18,6 +19,11 @@ class OptionStrategy(BaseStrategy):
     
     def on_bars(self, bars):
         super().on_bars(bars)
+        if self.groups == []:
+            self.load()
+        
+    def load(self):
+        print('Todo: load groups')
     
     def on_trade_response(self, body):
         if self.minutes_bars is not None:
@@ -54,6 +60,7 @@ class OptionStrategy(BaseStrategy):
                     'positions':[info],
                     'combinations': []
                 }
+                group = self.add_group_extra_info(group)
                 self.groups_store.add(group)
         else:
             group = old_group
@@ -103,8 +110,12 @@ class OptionStrategy(BaseStrategy):
             if group['positions'] == []: # 删除空分组
                 self.groups_store.delete(group['group_id'])
             else:    
+                group = self.add_group_extra_info(group)
                 self.groups_store.update(group)
-        
+    
+    def add_group_extra_info(self, group):
+        return group
+    
     def reset(self):
         self.day_contracts = []    
            

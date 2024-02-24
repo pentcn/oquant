@@ -242,25 +242,3 @@ class OptionGroup(ABC):
         pass
         
         
-# class Trader(ABC):
-    
-#     def __init__(self):
-#         ...
-    
-#     @abstractmethod
-#     def long_open(self, symbol, amount, price):
-#         ...
-        
-#     @abstractmethod
-#     def long_close(self, symbol, amount, price):
-#         ...
-        
-#     @abstractmethod
-#     def short_open(self, symbol, amount, price):
-#         ...
-        
-#     @abstractmethod
-#     def short_close(self, symbol, amount, price):
-#         ...
-        
-        

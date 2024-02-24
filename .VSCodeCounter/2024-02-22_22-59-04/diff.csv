@@ -1,0 +1,18 @@
+"filename", "language", "XML", "pip requirements", "Draw.io", "Python", "comment", "blank", "total"
+"d:\My Workspaces\2024\oquant\.idea\inspectionProfiles\Project_Default.xml", "XML", 15, 0, 0, 0, 0, 0, 15
+"d:\My Workspaces\2024\oquant\.idea\inspectionProfiles\profiles_settings.xml", "XML", 6, 0, 0, 0, 0, 0, 6
+"d:\My Workspaces\2024\oquant\.idea\misc.xml", "XML", 7, 0, 0, 0, 0, 0, 7
+"d:\My Workspaces\2024\oquant\.idea\modules.xml", "XML", 8, 0, 0, 0, 0, 0, 8
+"d:\My Workspaces\2024\oquant\.idea\oquant.iml", "XML", 12, 0, 0, 0, 0, 0, 12
+"d:\My Workspaces\2024\oquant\.idea\vcs.xml", "XML", 6, 0, 0, 0, 0, 0, 6
+"d:\My Workspaces\2024\oquant\.idea\workspace.xml", "XML", 56, 0, 0, 0, 0, 0, 56
+"d:\My Workspaces\2024\oquant\arch.drawio", "Draw.io", 0, 0, -3, 0, 0, 0, -3
+"d:\My Workspaces\2024\oquant\common\constant.py", "Python", 0, 0, 0, 1, 0, 0, 1
+"d:\My Workspaces\2024\oquant\requirements.txt", "pip requirements", 0, 135, 0, 0, 0, 0, 135
+"d:\My Workspaces\2024\oquant\strategy_center\center\base.py", "Python", 0, 0, 0, -12, 15, 3, 6
+"d:\My Workspaces\2024\oquant\strategy_center\center\data_feed.py", "Python", 0, 0, 0, 22, 0, 1, 23
+"d:\My Workspaces\2024\oquant\strategy_center\center\store.py", "Python", 0, 0, 0, 6, 0, 2, 8
+"d:\My Workspaces\2024\oquant\strategy_center\center\strategies\dual_dragon.py", "Python", 0, 0, 0, 13, 2, 8, 23
+"d:\My Workspaces\2024\oquant\strategy_center\center\strategy.py", "Python", 0, 0, 0, 9, 1, 2, 12
+"d:\My Workspaces\2024\oquant\strategy_center\center\trader.py", "Python", 0, 0, 0, 8, 0, 0, 8
+"Total", "-", 110, 135, -3, 47, 18, 16, 323
