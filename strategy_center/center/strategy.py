@@ -47,6 +47,16 @@ class OptionStrategy(BaseStrategy):
                     'amount': trade_info['amount'] ,
                     'price': trade_info['price']
                 }
+        if 'group' in trade_info:
+            if 'call' in trade_info['group']:
+                info['type'] = 'call'
+            elif 'put' in trade_info['group']:
+                info['type'] = 'put'
+            if 'type' in info:
+                for k, v in trade_info['group'][info['type']].items():
+                    if k not in ['symbol', 'price', 'amount']:
+                        info[k] = v
+        
         group = None
         old_group = self.groups_store[trade_info['group_id']]
         if old_group is None:
@@ -60,7 +70,6 @@ class OptionStrategy(BaseStrategy):
                     'positions':[info],
                     'combinations': []
                 }
-                group = self.add_group_extra_info(group)
                 self.groups_store.add(group)
         else:
             group = old_group
@@ -110,11 +119,8 @@ class OptionStrategy(BaseStrategy):
             if group['positions'] == []: # 删除空分组
                 self.groups_store.delete(group['group_id'])
             else:    
-                group = self.add_group_extra_info(group)
                 self.groups_store.update(group)
     
-    def add_group_extra_info(self, group):
-        return group
     
     def reset(self):
         self.day_contracts = []    

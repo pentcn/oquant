@@ -1,12 +1,10 @@
-from datetime import datetime, time, timedelta
 from strategy_center.center.strategy import OptionStrategy
 from strategy_center.center.option_group import DualDragonCombinations
-from common.utilities import get_fourth_wednesday
-from common.constant import RunMode
+
 
 class DualDragon(OptionStrategy):
-    def __init__(self, id, account_id, name, underlying_symbol, trader, store_host, exit_days=25):
-        super().__init__(id, account_id, name, underlying_symbol, trader, store_host, exit_days=exit_days)        
+    def __init__(self, id, account_id, name, underlying_symbol, trader, store_host, amount=1):
+        super().__init__(id, account_id, name, underlying_symbol, trader, store_host, amount=amount)        
         self.day_group = None
              
     def load(self):
@@ -15,31 +13,12 @@ class DualDragon(OptionStrategy):
     def on_bars(self, bars):     
         super().on_bars(bars)
         
-        undl_bar = bars[self.underlying_symbol]
-        dt = datetime.strptime(undl_bar['datetime'], "%Y-%m-%d %H:%M:%S")
-        
         if self.groups == []:
-            self.day_group = DualDragonCombinations(self)
+            self.day_group = DualDragonCombinations(self, amount=1, is_dairy_task=True)
             self.day_group.create_id()
             self.groups.append(self.day_group)
-        
-        if dt.time() ==  time(9, 30):
-            expired_date = get_fourth_wednesday(dt.year, dt.month)
-            month_type = 1 if 0 <=(expired_date - dt.date()).days <= self.exit_days else 0
-            symbol = self.data_feed.get_option_symbol(self.underlying_symbol, undl_bar['close'], month_type, '购', 3)
-            bar = self.data_feed.get_option_bar(self.underlying_symbol, symbol, undl_bar['datetime'])
-
-            self.day_group.long_open(symbol, 5, bar['close'])
-            self.day_group.short_open(symbol, 5, bar['close'])
-            self.day_group.short_open(symbol, 3, bar['close'] * 0.8)
-            self.day_group.long_close(symbol, 7, bar['close'] * 0.5)
-            self.day_group.long_open(symbol, 3, bar['close'] * 0.8)
-            self.day_group.short_close(symbol, 7, bar['close'] * 0.5)
             
-            self.day_group.combinate(symbol, 1, symbol, -1)
-            self.day_group.release('test')
-            ...
-
+        [group.on_bars(bars) for group in self.groups]        
         
     def on_trade_response(self, body):
         super().on_trade_response(body)
@@ -51,26 +30,7 @@ class DualDragon(OptionStrategy):
     def reset(self):
         super().reset()
         
-        # 建立双龙入海策略的当天交易组
-        self.day_group = DualDragonCombinations(self)
-        self.day_group.create_id()
+        self.day_group = None
+        self.groups = []
     
-    
-    def reset_groups(self):    
-        # 重置分组信息
-        groups = self.groups_store.get_all(self.id)
-        for group in groups:
-            combination = DualDragonCombinations(self)
-            combination.set_id(group['group_id'])
-            
-           
-            
-            
-            
-            self.groups.append(combination)
-            
-    def add_group_extra_info(self, group):
-        if group['combinations'] != []:
-            ...
-        return group
        

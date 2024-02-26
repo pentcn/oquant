@@ -19,8 +19,8 @@ mq_params = {
 if __name__ == '__main__':
     data_feed = WindETFOptionFileData(base_dir, start_date, end_date)
     trader = BacktestOptionTrader(store_host, data_feed, mq_params)
-    strategy_50etf_option = DualDragon('1', mq_params['account_id'], 'str_50etf_option', '510050.SH', trader, store_host) 
-    strategy_300etf_option = DualDragon('2', mq_params['account_id'], 'str_300etf_option', '510300.SH', trader, store_host)
+    strategy_50etf_option = DualDragon('1', mq_params['account_id'], 'str_50etf_option', '510050.SH', trader, store_host, amount=1) 
+    strategy_300etf_option = DualDragon('2', mq_params['account_id'], 'str_300etf_option', '510300.SH', trader, store_host, amount=1)
     
     engine = OptionEngine()
     engine.add_data_feed(data_feed)
