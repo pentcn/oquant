@@ -23,7 +23,7 @@ class OptionStrategy(BaseStrategy):
             self.load()
         
     def load(self):
-        print('Todo: load groups')
+        print('请在继承类中实现load方法')
     
     def on_trade_response(self, body):
         if self.minutes_bars is not None:
@@ -50,8 +50,10 @@ class OptionStrategy(BaseStrategy):
         if 'group' in trade_info:
             if 'call' in trade_info['group']:
                 info['type'] = 'call'
+                info['move_ratio'] = trade_info['group']['call']['move_ratio']
             elif 'put' in trade_info['group']:
                 info['type'] = 'put'
+                info['move_ratio'] = trade_info['group']['put']['move_ratio']
             if 'type' in info:
                 for k, v in trade_info['group'][info['type']].items():
                     if k not in ['symbol', 'price', 'amount']:

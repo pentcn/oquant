@@ -1,0 +1,70 @@
+Date : 2024-02-28 16:28:56
+Directory : d:\My Workspaces\2024\oquant
+Total : 29 files,  10887 codes, 31 comments, 341 blanks, all 11259 lines
+
+Languages
++------------------+------------+------------+------------+------------+------------+
+| language         | files      | code       | comment    | blank      | total      |
++------------------+------------+------------+------------+------------+------------+
+| CSV              |          1 |      8,313 |          0 |          1 |      8,314 |
+| Python           |         14 |      1,405 |         31 |        302 |      1,738 |
+| JSON             |          4 |        609 |          0 |          4 |        613 |
+| Draw.io          |          1 |        256 |          0 |          0 |        256 |
+| pip requirements |          1 |        135 |          0 |          0 |        135 |
+| XML              |          7 |        110 |          0 |          0 |        110 |
+| Markdown         |          1 |         59 |          0 |         34 |         93 |
++------------------+------------+------------+------------+------------+------------+
+
+Directories
++-------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                          | files      | code       | comment    | blank      | total      |
++-------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                             |         29 |     10,887 |         31 |        341 |     11,259 |
+| . (Files)                                                                     |          3 |        450 |          0 |         34 |        484 |
+| .idea                                                                         |          7 |        110 |          0 |          0 |        110 |
+| .idea (Files)                                                                 |          5 |         89 |          0 |          0 |         89 |
+| .idea\inspectionProfiles                                                      |          2 |         21 |          0 |          0 |         21 |
+| common                                                                        |          5 |      8,491 |          5 |         29 |      8,525 |
+| strategy_center                                                               |         10 |      1,256 |         20 |        266 |      1,542 |
+| strategy_center (Files)                                                       |          1 |         26 |          1 |          4 |         31 |
+| strategy_center\center                                                        |          9 |      1,230 |         19 |        262 |      1,511 |
+| strategy_center\center (Files)                                                |          8 |      1,187 |         19 |        247 |      1,453 |
+| strategy_center\center\strategies                                             |          1 |         43 |          0 |         15 |         58 |
+| test                                                                          |          4 |        580 |          6 |         12 |        598 |
++-------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++-------------------------------------------------------------------------------+------------------+------------+------------+------------+------------+
+| filename                                                                      | language         | code       | comment    | blank      | total      |
++-------------------------------------------------------------------------------+------------------+------------+------------+------------+------------+
+| d:\My Workspaces\2024\oquant\.idea\inspectionProfiles\Project_Default.xml     | XML              |         15 |          0 |          0 |         15 |
+| d:\My Workspaces\2024\oquant\.idea\inspectionProfiles\profiles_settings.xml   | XML              |          6 |          0 |          0 |          6 |
+| d:\My Workspaces\2024\oquant\.idea\misc.xml                                   | XML              |          7 |          0 |          0 |          7 |
+| d:\My Workspaces\2024\oquant\.idea\modules.xml                                | XML              |          8 |          0 |          0 |          8 |
+| d:\My Workspaces\2024\oquant\.idea\oquant.iml                                 | XML              |         12 |          0 |          0 |         12 |
+| d:\My Workspaces\2024\oquant\.idea\vcs.xml                                    | XML              |          6 |          0 |          0 |          6 |
+| d:\My Workspaces\2024\oquant\.idea\workspace.xml                              | XML              |         56 |          0 |          0 |         56 |
+| d:\My Workspaces\2024\oquant\README.md                                        | Markdown         |         59 |          0 |         34 |         93 |
+| d:\My Workspaces\2024\oquant\arch.drawio                                      | Draw.io          |        256 |          0 |          0 |        256 |
+| d:\My Workspaces\2024\oquant\common\calendar.csv                              | CSV              |      8,313 |          0 |          1 |      8,314 |
+| d:\My Workspaces\2024\oquant\common\calendar.py                               | Python           |         38 |          0 |          8 |         46 |
+| d:\My Workspaces\2024\oquant\common\constant.py                               | Python           |         32 |          0 |          8 |         40 |
+| d:\My Workspaces\2024\oquant\common\option_strategy.ipynb                     | JSON             |         83 |          0 |          1 |         84 |
+| d:\My Workspaces\2024\oquant\common\utilities.py                              | Python           |         25 |          5 |         11 |         41 |
+| d:\My Workspaces\2024\oquant\requirements.txt                                 | pip requirements |        135 |          0 |          0 |        135 |
+| d:\My Workspaces\2024\oquant\strategy_center\center\base.py                   | Python           |        188 |          0 |         57 |        245 |
+| d:\My Workspaces\2024\oquant\strategy_center\center\data_feed.py              | Python           |        218 |          2 |         42 |        262 |
+| d:\My Workspaces\2024\oquant\strategy_center\center\engine.py                 | Python           |         22 |         10 |         11 |         43 |
+| d:\My Workspaces\2024\oquant\strategy_center\center\mq.py                     | Python           |        129 |          2 |         20 |        151 |
+| d:\My Workspaces\2024\oquant\strategy_center\center\option_group.py           | Python           |        112 |          1 |         22 |        135 |
+| d:\My Workspaces\2024\oquant\strategy_center\center\store.py                  | Python           |        250 |          1 |         52 |        303 |
+| d:\My Workspaces\2024\oquant\strategy_center\center\strategies\dual_dragon.py | Python           |         43 |          0 |         15 |         58 |
+| d:\My Workspaces\2024\oquant\strategy_center\center\strategy.py               | Python           |        110 |          1 |         19 |        130 |
+| d:\My Workspaces\2024\oquant\strategy_center\center\trader.py                 | Python           |        158 |          2 |         24 |        184 |
+| d:\My Workspaces\2024\oquant\strategy_center\main.py                          | Python           |         26 |          1 |          4 |         31 |
+| d:\My Workspaces\2024\oquant\test\mong.ipynb                                  | JSON             |        257 |          0 |          1 |        258 |
+| d:\My Workspaces\2024\oquant\test\mq.ipynb                                    | JSON             |        182 |          0 |          1 |        183 |
+| d:\My Workspaces\2024\oquant\test\test.ipynb                                  | JSON             |         87 |          0 |          1 |         88 |
+| d:\My Workspaces\2024\oquant\test\test_mq.py                                  | Python           |         54 |          6 |          9 |         69 |
+| Total                                                                         |                  |     10,887 |         31 |        341 |     11,259 |
++-------------------------------------------------------------------------------+------------------+------------+------------+------------+------------+

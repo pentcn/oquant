@@ -4,6 +4,7 @@ from datetime import datetime
 from pymongo import MongoClient, errors
 
 from common.constant import Direction, Offset
+import traceback
 
 class MongoDBManager:
 
@@ -73,6 +74,8 @@ class MongoDBManager:
         collection = self.db[collection_name]
         doc = self.find_one(collection_name, query)
         if doc is None:
+            if '_id' in update_values:
+                del update_values['_id']
             return collection.insert_one(update_values)
         else:
             return collection.update_one(query, {'$set': update_values})
@@ -173,11 +176,8 @@ class StrategyGroups(MongoDBManager):
     def clear(self, strategy_id):
         cond = {'strategy_id': strategy_id}
         self.delete_data(self.collection_name, cond)
-        
-        
 
 
-        
 class StrategyHoldings(MongoDBManager):
     
     def __init__(self,account_id,  db_name='oquant_runtime', host='127.0.0.1'):
@@ -192,25 +192,33 @@ class StrategyHoldings(MongoDBManager):
         self.delete_data(self.collection_name, cond)        
         
     def update(self, strategy_id, trade_info, last_date=None):
-        cond = {'date': trade_info['date'], 'strategy_id': strategy_id}
-        old_holdings = self.find_one(self.collection_name, cond)
-        if old_holdings is None:            
-            old_holdings = self.get_holdings(strategy_id, last_date)
-            if old_holdings is None:
-                old_holdings = {
-                    'strategy_id': strategy_id,
-                    'date': trade_info['date'],
-                    'positions': [],
-                    'combinations': []
-                }
-        
-        holdings = old_holdings      
-        if trade_info['direction'] == Direction.NET.value: 
-            holdings['combinations'] = self.update_combinations(holdings['combinations'], trade_info)
-        else:
-            holdings['positions'] = self.update_positions(holdings['positions'], trade_info)       
-        
-        self.update_data(self.collection_name, cond, holdings)
+        try:
+            cond = {'date': trade_info['date'], 'strategy_id': strategy_id}
+            old_holdings = self.find_one(self.collection_name, cond)
+            if old_holdings is None:            
+                old_holdings = self.get_holdings(strategy_id, last_date)
+                if old_holdings is None:
+                    old_holdings = {
+                        'strategy_id': strategy_id,
+                        'date': trade_info['date'],
+                        'positions': [],
+                        'combinations': []
+                    }
+            
+            if old_holdings['date'] != trade_info['date']:
+                old_holdings['date'] = trade_info['date']
+            holdings = old_holdings      
+            if trade_info['direction'] == Direction.NET.value: 
+                holdings['combinations'] = self.update_combinations(holdings['combinations'], trade_info)
+            else:
+                holdings['positions'] = self.update_positions(holdings['positions'], trade_info)       
+            
+            self.update_data(self.collection_name, cond, holdings)  
+            ...
+        except Exception as e:
+            print(e)
+            traceback.print_exc()
+            return None
     
     def update_combinations(self, combinations, new_trade_info):
         if new_trade_info['offset'] == Offset.RELEASE.value:
@@ -289,4 +297,4 @@ class StrategyHoldings(MongoDBManager):
     def get_holdings(self, strategy_id, last_date):
         _date = last_date.strftime('%Y-%m-%d')
         holdings = self.find_data(self.collection_name, {'strategy_id': strategy_id, 'date': _date})
-        return holdings if holdings != [] else None
+        return holdings[0] if holdings != [] else None

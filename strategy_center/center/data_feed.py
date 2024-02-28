@@ -55,7 +55,7 @@ class WindETFOptionFileData(OptionsDataFeed):
         
     def get_option_symbol(self, underly_symbol, base_price, month_type, op_type, rank, has_appendix=False):
         df = self.contracts_info[underly_symbol]
-        month = sorted(list(set(list(df['month'].astype(int).values))))[month_type]
+        month = self.sort_month(list(set(list(df['month'].astype(int).values))))[month_type]
         df = df.loc[df['month']==str(month)]
         df = df.loc[df['option_type']==op_type]
         df = df.loc[df['appendix']!=''] if has_appendix else df.loc[df['appendix']=='']
@@ -80,6 +80,24 @@ class WindETFOptionFileData(OptionsDataFeed):
         df = df.loc[index]
         
         return df['code'] if not df.empty else None
+    
+    def get_option_symbol_by_percent(self, underly_symbol, base_price, month_type, op_type, rank, has_appendix=False):
+        df = self.contracts_info[underly_symbol]
+        month = self.sort_month(list(set(list(df['month'].astype(int).values))))[month_type]
+        df = df.loc[df['month']==str(month)]
+        df = df.loc[df['option_type']==op_type]
+        df = df.loc[df['appendix']!=''] if has_appendix else df.loc[df['appendix']=='']
+        df = df.loc[df['option_type']==op_type]
+        
+        df = df.sort_values('strike_price')
+        df.reset_index(drop=True, inplace=True)
+        
+        strike_price = df['strike_price'].astype(int).values 
+        strike_price = [abs(p-base_price * (1 + rank) * 1000) for p in strike_price]
+        indexes = [idx for idx, e in enumerate(strike_price) if min(strike_price) == e]
+        df = df.loc[indexes]
+        
+        return df[['code', 'strike_price']].to_dict(orient='records') if not df.empty else None
     
     def get_option_name(self, symbol):
         for _, df in self.contracts_info.items():
@@ -233,4 +251,12 @@ class WindETFOptionFileData(OptionsDataFeed):
     def reset_symbols(self):
         self.symbols = self.etf_symbols.copy()
         self.contract_symbols = []
+        
+    def sort_month(self, months):
+        if 3 in months and 12 in months:
+            _months = [m+12 for m in months if m <=6] + [m for m in months if m > 6]
+            _months = sorted(_months)
+            return [m for m in _months if m <= 12]+[m-12 for m in _months if m > 12]
+        else:
+            return sorted(months)
         
