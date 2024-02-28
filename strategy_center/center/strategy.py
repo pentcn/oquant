@@ -1,3 +1,4 @@
+import traceback
 from datetime import datetime
 from center.base import BaseStrategy
 from common.constant import Offset, Direction
@@ -37,6 +38,19 @@ class OptionStrategy(BaseStrategy):
         self.holdings_store.update(self.id, body.copy(), last_date)
         
         self.update_groups(body.copy())
+    #     self.dispatch_to_group(body.copy())
+
+    
+    def dispatch_to_group(self, body):
+        for group in self.groups:
+            if group.id == body['group_id']:
+                try:
+                    group.on_updated(body)
+                    break
+                except Exception as e:
+                    print(e)
+                    traceback.print_exc()
+                    break
     
     def update_groups(self, trade_info):
         if trade_info['direction'] in [Direction.LONG.value, Direction.SHORT.value]:
@@ -73,6 +87,7 @@ class OptionStrategy(BaseStrategy):
                     'combinations': []
                 }
                 self.groups_store.add(group)
+                self.dispatch_to_group(group)
         else:
             group = old_group
             positions = group['positions']
@@ -120,8 +135,10 @@ class OptionStrategy(BaseStrategy):
            
             if group['positions'] == []: # 删除空分组
                 self.groups_store.delete(group['group_id'])
+                self.dispatch_to_group(None)
             else:    
                 self.groups_store.update(group)
+                self.dispatch_to_group(group)
     
     
     def reset(self):

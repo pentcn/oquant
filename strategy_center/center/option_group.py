@@ -32,13 +32,71 @@ class DualDragonCombinations(OptionGroup):
             self._check_and_close_group(dt)
             
         # 测试移仓任务
-        symbol = '10002841.SH'
-        if ( symbol in bars and 
-            self.combination_info is not None and 
-            self.call_info['symbol'] == '10002841.SH' and 
-            self.call_info['move_price'] < bars[symbol]['close']):
-            ...
+        if dt.day == 20 and dt.time() == time(9, 30):
+            self._move_group(undl_bar['datetime'], undl_bar['close'])
 
+    def on_updated(self, group_info):
+        if group_info is None:
+            self.call_info = None
+            self.put_info = None
+            self.combination_info = None
+        else:
+            self.combination_info = group_info['combinations']
+            for pos in group_info['positions']:
+                if pos['type'] == 'call':
+                    self.call_info = pos
+                elif pos['type'] == 'put':
+                    self.put_info = pos
+
+    def _move_group(self, undl_time, undl_price, both=True):
+        data_feed = self.strategy.data_feed
+        underlying_symbol = self.strategy.underlying_symbol
+        if self.combination_info is not None:
+            if undl_price > self.call_info['move_price']:
+                base_info = self.call_info
+                other_info = self.put_info
+            if undl_price < self.put_info['move_price']:    
+                base_info = self.put_info
+                other_info = self.call_info
+            if undl_price > self.call_info['move_price'] or undl_price < self.put_info['move_price']:    
+                # 解除组合
+                self.release(self.combination_info[0]['comb_id'])
+                
+                # 计算新合约信息
+                op_type = '购' if base_info == self.call_info else '沽'
+                op_type2 = 'call' if op_type=='购' else 'put'
+                base_symbol, base_price, extra_info = self.find_target(undl_price, op_type, undl_time)
+                extra_info['group'][op_type2]['exit_date'] = base_info['exit_date']
+                
+                # 平仓超价的合约
+                bar = data_feed.get_option_bar(underlying_symbol, base_info['symbol'], undl_time)
+                self.long_close(base_info['symbol'], abs(base_info['amount']), bar['close'])
+                
+                # 开仓新合约
+                self.short_open(base_symbol, abs(base_info['amount']), base_price, extra_info)
+                
+                # 作另一端合约的处理
+                if both:
+                    # 计算新合约信息
+                    op_type = '购' if other_info == self.call_info else '沽'
+                    op_type2 = 'call' if op_type=='购' else 'put'
+                    other_symbol, other_price, extra_info = self.find_target(undl_price, op_type, undl_time)
+                    extra_info['group'][op_type2]['exit_date'] = base_info['exit_date']
+                    
+                    # 平仓超价的合约
+                    bar = data_feed.get_option_bar(underlying_symbol, other_info['symbol'], undl_time)
+                    self.long_close(other_info['symbol'], abs(other_info['amount']), bar['close'])
+                
+                    # 开仓新合约
+                    self.short_open(other_symbol, abs(other_info['amount']), other_price, extra_info)
+                
+                if both:
+                    self.combinate(base_symbol, base_info['amount'], other_symbol, other_info['amount'])
+                else:
+                    self.combinate(base_symbol, base_info['amount'], other_info['symbol'], other_info['amount'])
+        ...
+   
+   
     def _sell_options(self, undl_bar):
         call_symbol, call_price, extra_info = self.find_target(undl_bar['close'], '购', undl_bar['datetime'])
         self.short_open(call_symbol, self.amount, call_price, extra_info)
@@ -102,16 +160,14 @@ class DualDragonCombinations(OptionGroup):
                 exit_date = self.get_exit_date(dt, month_type, expired_date)
                 move_price = self.get_move_price(base_price, symbol)
                 extra_key = 'call' if option_type == '购' else 'put'
-                extra_info = {'group': {
-                    extra_key: {
+                extra_value = {
                         'symbol': symbol,
                         'price': price,
                         'amount': self.amount,
                         'exit_date': exit_date,
                         'move_price': move_price,
                         'move_ratio': self.move_ratio}
-
-                }}
+                extra_info = {'group': {extra_key: extra_value}}
                 return symbol, price, extra_info
             
         raise Exception('无法找到交易标的')
