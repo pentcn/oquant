@@ -1,5 +1,5 @@
 import traceback
-from datetime import datetime
+from datetime import datetime, date
 from center.base import BaseStrategy
 from common.constant import Offset, Direction
 
@@ -27,30 +27,31 @@ class OptionStrategy(BaseStrategy):
         print('请在继承类中实现load方法')
     
     def on_trade_response(self, body):
-        if self.minutes_bars is not None:
-            active_time = self.minutes_bars.iloc[-1]['datetime']
-            dt = datetime.strptime(active_time, '%Y-%m-%d %H:%M:%S')
-            body['date'] = dt.strftime('%Y-%m-%d')
-            body['time'] = dt.strftime('%H:%M:%S')        
-        self.trades_store.save(body)
-        
-        last_date = self.calendar.get_last_traded_date(body['date'])
-        self.holdings_store.update(self.id, body.copy(), last_date)
-        
-        self.update_groups(body.copy())
-    #     self.dispatch_to_group(body.copy())
+        try:
+            if self.minutes_bars is not None:
+                active_time = self.minutes_bars.iloc[-1]['datetime']
+                dt = datetime.strptime(active_time, '%Y-%m-%d %H:%M:%S')
+                body['date'] = dt.strftime('%Y-%m-%d')
+                body['time'] = dt.strftime('%H:%M:%S')        
+            self.trades_store.save(body)
+            
+            last_date = self.calendar.get_last_traded_date(body['date'])
+            self.holdings_store.update(self.id, body.copy(), last_date)
+            
+            self.update_groups(body.copy())
+        except Exception as e:
+            print(e)
+            traceback.print_exc()
 
     
     def dispatch_to_group(self, body):
+        if body is None:
+            return
+        
         for group in self.groups:
             if group.id == body['group_id']:
-                try:
-                    group.on_updated(body)
-                    break
-                except Exception as e:
-                    print(e)
-                    traceback.print_exc()
-                    break
+                group.on_updated(body)
+                break
     
     def update_groups(self, trade_info):
         if trade_info['direction'] in [Direction.LONG.value, Direction.SHORT.value]:
@@ -102,9 +103,12 @@ class OptionStrategy(BaseStrategy):
                     pos['price'] = (pos['price']*pos['amount'] + info['price']*info['amount'])/(pos['amount'] + info['amount'])
                     pos['amount'] = pos['amount'] + info['amount']
             elif trade_info['offset'] == Offset.CLOSE.value:                  
-                index = [idx for idx,p in enumerate(positions) if
+                indexes = [idx for idx,p in enumerate(positions) if
                            (p['symbol'] == info['symbol'] 
-                            and p['amount']/abs(p['amount']) != info['amount']/abs(info['amount']))][0]
+                            and p['amount']/abs(p['amount']) != info['amount']/abs(info['amount']))]
+                if indexes == []:
+                    return  # 按道理说，不应该出现这种情况，平了不存在的仓位，但50ETF20201214出现了此情况
+                index = indexes[0]
                 pos = positions[index]
                 profit = (pos['price'] - info['price']) * info['amount']
                 group['profit'] += profit

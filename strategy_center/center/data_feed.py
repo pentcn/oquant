@@ -1,5 +1,6 @@
 import pandas as pd
 import re
+from tqdm import tqdm
 from datetime import datetime, timedelta
 from pathlib import Path
 from abc import abstractmethod
@@ -41,8 +42,17 @@ class WindETFOptionFileData(OptionsDataFeed):
             self.contract_symbols.remove(symbol)
             
     def run(self):
-        active_date = self.start_date
-        while active_date <= self.end_date:
+        print(f'{datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')} 开始回测')
+        
+        # active_date = self.start_date
+        # while active_date <= self.end_date:
+        days_count = (self.end_date - self.start_date).days + 1
+        for i in tqdm(range(days_count), desc="正在回测"):
+            # print(f'{datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')} 数据日期{active_date}', end='\r')
+            active_date = self.start_date + timedelta(days=i)
+            
+            tqdm.write(f'当前回测日期:{active_date}')
+            
             self.contracts_data = self._read_daily_data(active_date)
             self._send_all_bar()
             
@@ -52,6 +62,8 @@ class WindETFOptionFileData(OptionsDataFeed):
                 
             active_date += timedelta(days=1)
         self.engine.end()  
+        
+        print(f'{datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')} 结束回测')
         
     def get_option_symbol(self, underly_symbol, base_price, month_type, op_type, rank, has_appendix=False):
         df = self.contracts_info[underly_symbol]

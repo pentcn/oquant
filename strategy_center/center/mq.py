@@ -43,8 +43,8 @@ class MessageQueueSender:
             self.channel.basic_publish(exchange='',
                                        routing_key=queue_name,
                                        body=message)
-            print(datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'))
-            print(f" [x] Sent '{message}'")
+            # print(datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'))
+            # print(f" [x] Sent '{message}'")
         except pika.exceptions.ConnectionClosedByBroker:
             print("Connection closed by broker, trying to reconnect...")
             self.connection = None  # 重置连接

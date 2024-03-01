@@ -12,6 +12,7 @@ class DualDragonCombinations(OptionGroup):
         
         self.exit_days = 25
         self.step = 0.06
+        self.both_moving = True
         self.move_ratio = move_ratio
         self.amount = amount
         
@@ -28,12 +29,12 @@ class DualDragonCombinations(OptionGroup):
             self._sell_options(undl_bar)
         
         # 每天9:30完成符合条件的平仓任务
-        if dt.time() == time(9, 30) :
+        if dt.time() == time(14, 55) :
             self._check_and_close_group(dt)
             
         # 测试移仓任务
-        if dt.day == 20 and dt.time() == time(9, 30):
-            self._move_group(undl_bar['datetime'], undl_bar['close'])
+        if dt.time() == time(14, 50):
+            self._move_group(undl_bar['datetime'], undl_bar['close'], both=self.both_moving)
 
     def on_updated(self, group_info):
         if group_info is None:
@@ -51,7 +52,7 @@ class DualDragonCombinations(OptionGroup):
     def _move_group(self, undl_time, undl_price, both=True):
         data_feed = self.strategy.data_feed
         underlying_symbol = self.strategy.underlying_symbol
-        if self.combination_info is not None:
+        if self.combination_info is not None and self.combination_info != []:
             if undl_price > self.call_info['move_price']:
                 base_info = self.call_info
                 other_info = self.put_info
@@ -112,7 +113,7 @@ class DualDragonCombinations(OptionGroup):
     def _check_and_close_group(self, dt):
         data_feed = self.strategy.data_feed
         underlying_symbol = self.strategy.underlying_symbol
-        if self.combination_info is not None:
+        if self.combination_info is not None and self.combination_info != []:
             if self.call_info['exit_date'] <= dt.strftime('%Y-%m-%d'):
                 self.release(self.combination_info[0]['comb_id'])
                 call_bar = data_feed.get_option_bar(underlying_symbol, self.call_info['symbol'], dt.strftime('%Y-%m-%d %H:%M:%S'))
@@ -129,9 +130,11 @@ class DualDragonCombinations(OptionGroup):
     def get_exit_date(self, dt, month_type,  expired_date):
         (year, month) = (dt.year, dt.month + 1) if dt.month < 12 else (dt.year+1, 1)
         next_expired_date = get_fourth_wednesday(year, month)
-        if (month_type == 1 and dt.date() >= expired_date 
-            or month_type == 0 and dt.date() < expired_date):            
+        
+        if month_type == 1 and dt.date() >= expired_date:            
             exit_date = next_expired_date
+        elif month_type == 0 and dt.date() < expired_date:
+            exit_date = expired_date
         else:
             diff_days = (expired_date - dt.date()).days
             exit_date = next_expired_date - timedelta(days=diff_days)
@@ -153,7 +156,7 @@ class DualDragonCombinations(OptionGroup):
     def find_target(self, base_price, option_type, sdatetime):
         dt = datetime.strptime(sdatetime, '%Y-%m-%d %H:%M:%S')
         expired_date = get_fourth_wednesday(dt.year, dt.month)
-        start_month_type = 1 if 0 <=(expired_date - dt.date()).days <= self.exit_days else 0
+        start_month_type = 1 if (expired_date - dt.date()).days <= self.exit_days else 0
         for month_type in range(start_month_type, 4):
             symbol, price = self.get_symbol_and_price( base_price, month_type, option_type, sdatetime, self.step)
             if price is not None:
