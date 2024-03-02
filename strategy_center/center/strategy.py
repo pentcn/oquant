@@ -1,9 +1,10 @@
 import traceback
+import threading
 from datetime import datetime, date
 from center.base import BaseStrategy
 from common.constant import Offset, Direction
 
-
+db_lock = threading.Lock()
 class OptionStrategy(BaseStrategy):
     
     def __init__(self, id, account_id, name, underlying_symbol, trader, store_host, **kwargs):
@@ -15,8 +16,7 @@ class OptionStrategy(BaseStrategy):
         print("OptionEngine start")
     
     def stop(self):
-        if self.trader.response_mq is not None:
-            self.trader.response_mq.stop()
+        self.trader.stop()
     
     def on_bars(self, bars):
         super().on_bars(bars)
@@ -28,17 +28,18 @@ class OptionStrategy(BaseStrategy):
     
     def on_trade_response(self, body):
         try:
-            if self.minutes_bars is not None:
-                active_time = self.minutes_bars.iloc[-1]['datetime']
-                dt = datetime.strptime(active_time, '%Y-%m-%d %H:%M:%S')
-                body['date'] = dt.strftime('%Y-%m-%d')
-                body['time'] = dt.strftime('%H:%M:%S')        
-            self.trades_store.save(body)
-            
-            last_date = self.calendar.get_last_traded_date(body['date'])
-            self.holdings_store.update(self.id, body.copy(), last_date)
-            
-            self.update_groups(body.copy())
+            with db_lock:
+                if self.minutes_bars is not None:
+                    active_time = self.minutes_bars.iloc[-1]['datetime']
+                    dt = datetime.strptime(active_time, '%Y-%m-%d %H:%M:%S')
+                    body['date'] = dt.strftime('%Y-%m-%d')
+                    body['time'] = dt.strftime('%H:%M:%S')        
+                self.trades_store.save(body)
+                
+                last_date = self.calendar.get_last_traded_date(body['date'])
+                self.holdings_store.update(self.id, body.copy(), last_date)
+                
+                self.update_groups(body.copy())
         except Exception as e:
             print(e)
             traceback.print_exc()

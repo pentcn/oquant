@@ -39,7 +39,9 @@ class DualDragon(OptionStrategy):
     def on_bars(self, bars):     
         super().on_bars(bars)
         
-        [group.on_bars(bars) for group in self.groups]        
+        # [group.on_bars(bars) for group in self.groups]    
+        for i, group in enumerate(self.groups):
+            group.on_bars(bars)
         
     def on_trade_response(self, body):
         super().on_trade_response(body)
