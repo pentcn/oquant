@@ -1,7 +1,9 @@
 import pandas as pd
 import re
+import threading
 from tqdm import tqdm
 from datetime import datetime, timedelta
+from time import sleep
 from pathlib import Path
 from abc import abstractmethod
 from center.base import BaseDataFeed
@@ -26,6 +28,7 @@ class WindETFOptionFileData(OptionsDataFeed):
         self.end_date = end_date
         self.etf_symbols = []
         self.contract_symbols = []
+        self.sync_lock = threading.Lock()
         
     def add_symbol(self, symbol):
         super().add_symbol(symbol)
@@ -62,7 +65,7 @@ class WindETFOptionFileData(OptionsDataFeed):
                 
             active_date += timedelta(days=1)
         self.engine.end()  
-        
+        sleep(2)
         print(f'{datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')} 结束回测')
         
     def get_option_symbol(self, underly_symbol, base_price, month_type, op_type, rank, has_appendix=False):

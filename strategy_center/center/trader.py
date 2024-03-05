@@ -2,7 +2,7 @@ import json
 import random
 from functools import wraps
 from strategy_center.center.base import BaseTrader
-from strategy_center.center.mq import MessageQueue, MessageQueueSender, MessageQueueReceiver
+from strategy_center.center.mq import MessageQueue
 from common.utilities import dataclass_to_dict
 from common.constant import (
     Request,
@@ -23,6 +23,8 @@ def mq_trade(method):
             req_dict.update(extra_info)
         strategy.svars_store[req.id] = req_dict 
         self.mq.send(req)
+        if hasattr(self.data_feed, 'sync_lock'):
+            self.data_feed.sync_lock.acquire()
         return req_dict
     return wrapper
 
@@ -159,9 +161,10 @@ class OptionTrader(BaseTrader):
                              self.vhost, 
                              self.account_id,
                              self.on_response)
+        self.mq.start()
 
     def check_mq(self):
-        if not hasattr(self, 'mq') or self.mq.connection is None or self.mq.connection.is_closed:
+        if not hasattr(self, 'mq'):
             self.mq = MessageQueue(self.user_name, 
                                          self.password, 
                                          self.host, 
@@ -253,6 +256,8 @@ class OptionTrader(BaseTrader):
             body['remark'] = obj['remark']
             if self.data_feed is not None and self.data_feed.engine is not None:
                 self.data_feed.engine.on_trade_response(body)
+                if hasattr(self.data_feed, 'sync_lock'):
+                    self.data_feed.sync_lock.release()
         ...
 
 
@@ -260,58 +265,64 @@ class BacktestOptionTrader(OptionTrader):
     def __init__(self, store_host, data_feed, mq_params):
         super().__init__(store_host, data_feed, mq_params)
         
-        # self.trade_mq = MessageQueue(self.user_name, 
-        #                                  self.password, 
-        #                                  self.host, 
-        #                                  self.vhost, 
-        #                                  self.account_id,
-        #                                  self.on_request_arrived)
-        # self.trade_mq.receive_queue_name, self.trade_mq.send_queue_name = self.trade_mq.send_queue_name, self.trade_mq.receive_queue_name
+        self.trade_mq = MessageQueue(self.user_name, 
+                                         self.password, 
+                                         self.host, 
+                                         self.vhost, 
+                                         self.account_id,
+                                         None, #self.on_request_arrived,
+                                         request_side=False)
+        self.trade_mq.start()
         ...
         
-    def on_request_arrived(self, message):
-        self.trade_mq(message)
+    # def on_request_arrived(self, message):
+    #     obj = json.loads(message.decode('utf-8'))       
+    #     res_obj = {'req_id': obj['id'], 'remark': f'{random.randint(100000, 999999)}' if obj['offset'] == Offset.COMBINATE.value else''}
+    #     res_message = json.dumps(res_obj)
+    #     self.trade_mq.send(res_message)
+               
     
     
     def stop(self):
         self.mq.stop()
-        # self.trade_mq.stop()
-    # def long_open(self, strategy, symbol, amount, price, extra_info):
-    #     req_dict = super().long_open(strategy, symbol, amount, price, extra_info)
-    #     res_message = json.dumps({'req_id': req_dict['id'], 'remark': ''})
-    #     self.mq.response(res_message)
-    #     return req_dict
+        self.trade_mq.stop()
+        
+    def long_open(self, strategy, symbol, amount, price, extra_info):
+        req_dict = super().long_open(strategy, symbol, amount, price, extra_info)
+        res_message = json.dumps({'req_id': req_dict['id'], 'remark': ''})
+        self.trade_mq.send(res_message)
+        return req_dict
         
     
-    # def long_close(self, strategy, symbol, amount, price, extra_info):
-    #     req_dict = super().long_close(strategy, symbol, amount, price, extra_info)
-    #     res_message = json.dumps({'req_id': req_dict['id'], 'remark': ''})
-    #     self.mq.response(res_message)
-    #     return req_dict
+    def long_close(self, strategy, symbol, amount, price, extra_info):
+        req_dict = super().long_close(strategy, symbol, amount, price, extra_info)
+        res_message = json.dumps({'req_id': req_dict['id'], 'remark': ''})
+        self.trade_mq.send(res_message)
+        return req_dict
     
-    # def short_open(self, strategy, symbol, amount, price, extra_info):
-    #     req_dict = super().short_open(strategy, symbol, amount, price, extra_info)
-    #     res_message = json.dumps({'req_id': req_dict['id'], 'remark': ''})
-    #     self.mq.response(res_message)
-    #     return req_dict
+    def short_open(self, strategy, symbol, amount, price, extra_info):
+        req_dict = super().short_open(strategy, symbol, amount, price, extra_info)
+        res_message = json.dumps({'req_id': req_dict['id'], 'remark': ''})
+        self.trade_mq.send(res_message)
+        return req_dict
     
-    # def short_close(self, strategy, symbol, amount, price, extra_info):
-    #     req_dict = super().short_close(strategy, symbol, amount, price, extra_info)
-    #     res_message = json.dumps({'req_id': req_dict['id'], 'remark': ''})
-    #     self.mq.response(res_message)
-    #     return req_dict
+    def short_close(self, strategy, symbol, amount, price, extra_info):
+        req_dict = super().short_close(strategy, symbol, amount, price, extra_info)
+        res_message = json.dumps({'req_id': req_dict['id'], 'remark': ''})
+        self.trade_mq.send(res_message)
+        return req_dict
     
-    # def combinate(self, strategy, symbol_1, amount_1, symbol_2, amount_2, extra_info):
-    #     req_dict = super().combinate(strategy, symbol_1, amount_1, symbol_2, amount_2, extra_info)
-    #     res_message = json.dumps({'req_id': req_dict['id'], 'remark': f'{random.randint(100000, 999999)}'})
-    #     self.mq.response(res_message)
-    #     return req_dict
+    def combinate(self, strategy, symbol_1, amount_1, symbol_2, amount_2, extra_info):
+        req_dict = super().combinate(strategy, symbol_1, amount_1, symbol_2, amount_2, extra_info)
+        res_message = json.dumps({'req_id': req_dict['id'], 'remark': f'{random.randint(100000, 999999)}'})
+        self.trade_mq.send(res_message)
+        return req_dict
 
-    # def release(self, strategy, combination_id, extra_info):
-    #     req_dict = super().release(strategy, combination_id, extra_info)
-    #     res_message = json.dumps({'req_id': req_dict['id'], 'remark': ''})
-    #     self.mq.response(res_message)
-    #     return req_dict
+    def release(self, strategy, combination_id, extra_info):
+        req_dict = super().release(strategy, combination_id, extra_info)
+        res_message = json.dumps({'req_id': req_dict['id'], 'remark': ''})
+        self.trade_mq.send(res_message)
+        return req_dict
     
     
 

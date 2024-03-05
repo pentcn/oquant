@@ -1,12 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
   <component name="ChangeListManager">
     <list default="true" id="0c72b1e8-9be1-4161-9cc1-df885b8e4b31" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/arch.drawio" beforeDir="false" afterPath="$PROJECT_DIR$/arch.drawio" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/strategy_center/center/base.py" beforeDir="false" afterPath="$PROJECT_DIR$/strategy_center/center/base.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/strategy_center/center/store.py" beforeDir="false" afterPath="$PROJECT_DIR$/strategy_center/center/store.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/strategy_center/center/strategies/dual_dragon.py" beforeDir="false" afterPath="$PROJECT_DIR$/strategy_center/center/strategies/dual_dragon.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/strategy_center/center/data_feed.py" beforeDir="false" afterPath="$PROJECT_DIR$/strategy_center/center/data_feed.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/strategy_center/center/mq.py" beforeDir="false" afterPath="$PROJECT_DIR$/strategy_center/center/mq.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/strategy_center/center/strategy.py" beforeDir="false" afterPath="$PROJECT_DIR$/strategy_center/center/strategy.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/strategy_center/center/trader.py" beforeDir="false" afterPath="$PROJECT_DIR$/strategy_center/center/trader.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/strategy_center/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/strategy_center/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/mmmq.py" beforeDir="false" afterPath="$PROJECT_DIR$/test/mmmq.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/test.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/test/test.ipynb" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -19,9 +25,9 @@
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 7
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 7
+}</component>
   <component name="ProjectId" id="2ceu6PyOafdtqeAtgKN6K2SPrIy" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -31,7 +37,7 @@
   "keyToString": {
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "feature/导入已有group",
+    "git-widget-placeholder": "feature/以group为中心的响应",
     "last_opened_file_path": "D:/My Workspaces/2024/oquant"
   }
 }]]></component>

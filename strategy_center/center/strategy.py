@@ -17,6 +17,7 @@ class OptionStrategy(BaseStrategy):
     
     def stop(self):
         self.trader.stop()
+        ...
     
     def on_bars(self, bars):
         super().on_bars(bars)
