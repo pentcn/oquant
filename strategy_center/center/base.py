@@ -1,4 +1,5 @@
 import pandas as pd
+from datetime import datetime, time
 from abc import ABC, abstractmethod
 from uuid import uuid4
 
@@ -8,7 +9,8 @@ from strategy_center.center.store import (
     StrategyVars,
     StrategyTrades,
     StrategyHoldings,
-    StrategyGroups
+    StrategyGroups,
+    GroupPrice
 )
 
 
@@ -38,6 +40,7 @@ class BaseEngine(ABC):
             strategy.trades_store.clear(strategy.id)
             strategy.holdings_store.clear(strategy.id)
             strategy.groups_store.clear(strategy.id)
+            strategy.groups_prices_store.clear(strategy.id)
 
     def remove_strategy(self, strategy_id):
         del self.strategy_list[strategy_id]
@@ -100,6 +103,7 @@ class BaseStrategy(ABC):
         self.trades_store = StrategyTrades(account_id, host=store_host)
         self.holdings_store = StrategyHoldings(account_id, host=store_host)
         self.groups_store = StrategyGroups(account_id, host=store_host)
+        self.groups_prices_store = GroupPrice(account_id, host=store_host)
         self.last_trade_date = None
         
         if BaseStrategy.calendar is None:
@@ -169,9 +173,11 @@ class OptionGroup(ABC):
     def __init__(self, strategy):
         self.id = None
         self.options = []
+        self.history_bars = {}
         self.strategy = strategy
         self.create_time = None
         self.destroy_time = None
+        self.last_bars = None
         self.trader = strategy.trader
         
     def create_id(self):
@@ -182,6 +188,35 @@ class OptionGroup(ABC):
         
     def add_options(self, option):
         self.options.append(option)
+        
+    @property
+    def run_mode(self):
+        return self.strategy.engine.run_mode
+    
+    def on_bars(self, bars):
+        self.last_bars = bars
+        if len(bars) > 1:
+            dt = list(bars.values())[0]['datetime']
+            data = {k:v['close'] for k, v in bars.items()}
+            self.history_bars.update({dt: data})
+            
+            if self.run_mode == RunMode.BACKTEST:
+                if datetime.strptime(dt, '%Y-%m-%d %H:%M:%S').time() == time(15):
+                    self.save_prices(self.history_bars)
+            else:
+                print('Todo: 在实盘模式下，保存交易单元的K线')
+    
+    def save_prices(self, prices):
+        self.strategy.groups_prices_store.save(self.strategy.id, self.id, prices)
+    
+    def save_trade_to_history(self, symbol, price):
+        undl_symbol = self.strategy.underlying_symbol
+        dt = self.last_bars[undl_symbol]['datetime']
+        data = {undl_symbol: self.last_bars[undl_symbol]['close'], symbol: price}
+        if dt in self.history_bars:
+            self.history_bars[dt].update(data)
+        else:
+            self.history_bars.update({dt: data})
     
     def long_open(self, symbol, amount, price, extra_info=None):
         if extra_info is None:
@@ -190,6 +225,8 @@ class OptionGroup(ABC):
             }
         else:
             extra_info['group_id'] = self.id
+        self.options.append(symbol)
+        self.save_trade_to_history(symbol, price)
         return self.trader.long_open(self.strategy, symbol, amount, price, extra_info)
         
     def long_close(self, symbol, amount, price, extra_info=None):
@@ -199,6 +236,7 @@ class OptionGroup(ABC):
             }
         else:
             extra_info['group_id'] = self.id
+        self.options = [opt for opt in self.options if opt != symbol]
         return self.trader.long_close(self.strategy, symbol, amount, price, extra_info)
         
     def short_open(self, symbol, amount, price, extra_info=None):
@@ -208,6 +246,8 @@ class OptionGroup(ABC):
             }
         else:
             extra_info['group_id'] = self.id
+        self.options.append(symbol)
+        self.save_trade_to_history(symbol, price)
         return self.trader.short_open(self.strategy, symbol, amount, price, extra_info)
         
     def short_close(self, symbol, amount, price, extra_info=None):
@@ -217,6 +257,7 @@ class OptionGroup(ABC):
             }
         else:
             extra_info['group_id'] = self.id
+        self.options = [opt for opt in self.options if opt != symbol]
         return self.trader.short_close(self.strategy, symbol, amount, price, extra_info)
             
     def combinate(self, symbol_1, amount_1, symbol_2, amount_2, extra_info=None):
@@ -237,8 +278,5 @@ class OptionGroup(ABC):
             extra_info['group_id'] = self.id
         return self.trader.release(self.strategy, combination_id, extra_info)
     
-    @abstractmethod
-    def on_bars(self, bars):
-        pass
         
         

@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 from time import sleep
 from pathlib import Path
 from abc import abstractmethod
+from icecream import ic
 from center.base import BaseDataFeed
 from common.constant import RunMode
 
@@ -36,6 +37,13 @@ class WindETFOptionFileData(OptionsDataFeed):
             self.etf_symbols.append(symbol)
         elif len(symbol) > 9 and symbol not in self.contract_symbols:
             self.contract_symbols.append(symbol)
+            
+    def add_symbol_and_data(self, underly_symbol, option_symbol):
+        self.add_symbol(option_symbol)
+        df = self.contracts_info[underly_symbol]
+        data_path = df.loc[df['code']==option_symbol]['remark'].values[0]
+        data = pd.read_csv(data_path)
+        self.contracts_data[option_symbol] = data
     
     def remove_symbol(self, symbol):
         super().remove_symbol(symbol)
@@ -45,28 +53,32 @@ class WindETFOptionFileData(OptionsDataFeed):
             self.contract_symbols.remove(symbol)
             
     def run(self):
-        print(f'{datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')} 开始回测')
-        
-        # active_date = self.start_date
-        # while active_date <= self.end_date:
         days_count = (self.end_date - self.start_date).days + 1
-        for i in tqdm(range(days_count), desc="正在回测"):
-            # print(f'{datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')} 数据日期{active_date}', end='\r')
+        progress_bar = tqdm(total=days_count)
+        for i in range(days_count):
             active_date = self.start_date + timedelta(days=i)
-            
-            tqdm.write(f'当前回测日期:{active_date}')
-            
+            progress_bar.set_description(f'{active_date.strftime("%Y-%m-%d")}')
+            self.before_market()
             self.contracts_data = self._read_daily_data(active_date)
+            # ic(self.contracts_data.keys())
             self._send_all_bar()
             
-            if self.engine.run_mode == RunMode.BACKTEST:
-                self.reset_symbols()                
-                self.engine.reset_strategies()
+            self.after_market()
                 
             active_date += timedelta(days=1)
+            progress_bar.update(1)
         self.engine.end()  
         sleep(2)
-        print(f'{datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')} 结束回测')
+
+    def after_market(self):
+        if self.engine.run_mode == RunMode.BACKTEST:
+            self.reset_symbols()                
+            self.engine.reset_strategies()
+        
+    def before_market(self):
+        for strategy in self.engine.strategy_list:
+            if hasattr(strategy, 'before_market'):
+                strategy.before_market()
         
     def get_option_symbol(self, underly_symbol, base_price, month_type, op_type, rank, has_appendix=False):
         df = self.contracts_info[underly_symbol]
@@ -185,7 +197,7 @@ class WindETFOptionFileData(OptionsDataFeed):
                     if filename.suffix == '.csv' and filename.stem.startswith(symbol):
                         return str(filename)
             else:
-                print(f'{daily_path}文件不存在')
+                # print(f'{daily_path}文件不存在')
                 return None
         return None
         # raise ValueError(f'Unsupported symbol: {symbol}')
