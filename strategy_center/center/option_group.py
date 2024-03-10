@@ -1,8 +1,9 @@
 import re
-from datetime import datetime, time
+from datetime import datetime, time, date
 from common.utilities import get_fourth_wednesday
 from strategy_center.center.base import OptionGroup
 from datetime import timedelta
+from icecream import ic
 
 
 class DualDragonCombinations(OptionGroup):
@@ -15,26 +16,42 @@ class DualDragonCombinations(OptionGroup):
         self.both_moving = True
         self.move_ratio = move_ratio
         self.amount = amount
+
         
         self.call_info = None
         self.put_info = None
         self.combination_info = None
 
-    def on_bars(self, bars):
+    def on_bars(self, bars):  
+        super().on_bars(bars)    
+        
         undl_bar = bars[self.strategy.underlying_symbol]
         dt = datetime.strptime(undl_bar['datetime'], '%Y-%m-%d %H:%M:%S')
         
         # 每天9:30卖出一组期权
-        if self.is_dairy_task and self._is_none_group() and dt.time() == time(9, 30):
-            self._sell_options(undl_bar)
+        # if self.is_dairy_task and self._is_none_group() and dt.time() == time(9, 30):
+        #     if dt.date() == date(2020, 6, 17):
+        #         self._sell_options(undl_bar)
+        
+        if self.is_dairy_task:
+            if dt.date() == date(2020, 6, 17):
+                if dt.time() == time(9, 30):
+                    ic('注意：仅仅为了测试一组')
+                if dt.time() == time(9, 35):
+                    self._sell_call(undl_bar)
+                elif dt.time() == time(9, 41):
+                    self._sell_put(undl_bar)
+        
+        
         
         # 每天9:30完成符合条件的平仓任务
         if dt.time() == time(14, 55) :
             self._check_and_close_group(dt)
             
-        # 测试移仓任务
+        # 移仓任务
         if dt.time() == time(14, 50):
             self._move_group(undl_bar['datetime'], undl_bar['close'], both=self.both_moving)
+            
 
     def on_updated(self, group_info):
         if group_info is None:
@@ -82,9 +99,11 @@ class DualDragonCombinations(OptionGroup):
                     op_type = '购' if other_info == self.call_info else '沽'
                     op_type2 = 'call' if op_type=='购' else 'put'
                     other_symbol, other_price, extra_info = self.find_target(undl_price, op_type, undl_time)
+                    
+                    # todo: 如果other_symbol同原合约代码相同，则不新开仓
                     extra_info['group'][op_type2]['exit_date'] = base_info['exit_date']
                     
-                    # 平仓超价的合约
+                    # 平仓以前组合的合约
                     bar = data_feed.get_option_bar(underlying_symbol, other_info['symbol'], undl_time)
                     self.long_close(other_info['symbol'], abs(other_info['amount']), bar['close'])
                 
@@ -95,17 +114,32 @@ class DualDragonCombinations(OptionGroup):
                     self.combinate(base_symbol, base_info['amount'], other_symbol, other_info['amount'])
                 else:
                     self.combinate(base_symbol, base_info['amount'], other_info['symbol'], other_info['amount'])
-        ...
+                ...
    
    
     def _sell_options(self, undl_bar):
+        self._sell_call(undl_bar)
+        self._sell_put(undl_bar)      
+
+        
+        
+        
+    def _sell_call(self, undl_bar):
         call_symbol, call_price, extra_info = self.find_target(undl_bar['close'], '购', undl_bar['datetime'])
         self.short_open(call_symbol, self.amount, call_price, extra_info)
         
+        if self.put_info is not None:
+            put_symbol = self.put_info['symbol']
+            self.combinate(call_symbol, -self.amount, put_symbol, -self.amount)
+        
+    def _sell_put(self, undl_bar):
         put_symbol, put_price, extra_info = self.find_target(undl_bar['close'], '沽', undl_bar['datetime'])
         self.short_open(put_symbol, self.amount, put_price, extra_info)
         
-        self.combinate(call_symbol, -self.amount, put_symbol, -self.amount)
+        if self.call_info is not None:
+            call_symbol = self.call_info['symbol']        
+            self.combinate(call_symbol, -self.amount, put_symbol, -self.amount)
+            
     
     def _is_none_group(self):
         return self.call_info is None and self.put_info is None

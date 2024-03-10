@@ -69,6 +69,11 @@ class MongoDBManager:
         return collection.find_one(query)
 
     @_auto_reconnect
+    def update_one(self, collection_name, query, update_values):
+        collection = self.db[collection_name]
+        return collection.update_one(query, {'$set': update_values})
+
+    @_auto_reconnect
     def update_data(self, collection_name, query, update_values):
         """更新指定集合中符合条件的数据"""
         collection = self.db[collection_name]
@@ -92,13 +97,33 @@ class MongoDBManager:
         collection = self.db[collection_name]
         doc = collection.find_one(query)
         return True if doc else False
-    
 
     def close_connection(self):
         """关闭 MongoDB 连接"""
         if self.client:
             self.client.close()
 
+
+class GroupPrice(MongoDBManager):
+    def __init__(self, account_id, db_name='oquant_runtime', host='127.0.0.1'):
+        super().__init__(db_name, host)
+        self.collection_name = f'{account_id}:group_prices'
+        
+    def clear(self, strategy_id):
+        cond = {"strategy_id": strategy_id}
+        self.delete_data(self.collection_name, cond)
+        
+    def save(self, strategy_id, group_id, prices):
+        existing_doc = self.find_one(self.collection_name, {'group_id': group_id})
+
+        if existing_doc:
+            # 如果文档存在，则更新 prices 数组
+            existing_prices = json.loads(existing_doc.get('prices', {}))
+            existing_prices.update(prices)
+            self.update_one(self.collection_name, {'strategy_id': strategy_id, 'group_id': group_id}, {'prices': json.dumps(existing_prices)})
+        else:
+            # 如果文档不存在，则新建文档
+            self.insert_data(self.collection_name, {'strategy_id': strategy_id, 'group_id': group_id, 'prices': json.dumps(prices)})
 
 class StrategyVars(MongoDBManager):
     
@@ -138,7 +163,7 @@ class StrategyVars(MongoDBManager):
 
 class StrategyTrades(MongoDBManager):
     
-    def __init__(self,account_id,  db_name='oquant_runtime', host='127.0.0.1'):
+    def __init__(self, account_id,  db_name='oquant_runtime', host='127.0.0.1'):
         super().__init__(db_name, host)
         self.collection_name = f'{account_id}:trades'
     

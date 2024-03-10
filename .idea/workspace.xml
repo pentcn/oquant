@@ -5,14 +5,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0c72b1e8-9be1-4161-9cc1-df885b8e4b31" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/strategy_center/center/data_feed.py" beforeDir="false" afterPath="$PROJECT_DIR$/strategy_center/center/data_feed.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/strategy_center/center/mq.py" beforeDir="false" afterPath="$PROJECT_DIR$/strategy_center/center/mq.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/strategy_center/center/strategy.py" beforeDir="false" afterPath="$PROJECT_DIR$/strategy_center/center/strategy.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/strategy_center/center/trader.py" beforeDir="false" afterPath="$PROJECT_DIR$/strategy_center/center/trader.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/strategy_center/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/strategy_center/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test/mmmq.py" beforeDir="false" afterPath="$PROJECT_DIR$/test/mmmq.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test/test.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/test/test.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.VSCodeCounter/2024-02-20_14-03-04/details.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.VSCodeCounter/2024-02-20_14-03-04/diff-details.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.VSCodeCounter/2024-02-20_14-03-04/diff.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.VSCodeCounter/2024-02-20_14-03-04/diff.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.VSCodeCounter/2024-02-20_14-03-04/diff.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.VSCodeCounter/2024-02-20_14-03-04/results.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.VSCodeCounter/2024-02-20_14-03-04/results.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.VSCodeCounter/2024-02-20_14-03-04/results.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.VSCodeCounter/2024-02-20_14-03-04/results.txt" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -37,8 +38,8 @@
   "keyToString": {
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "feature/以group为中心的响应",
-    "last_opened_file_path": "D:/My Workspaces/2024/oquant"
+    "git-widget-placeholder": "feature/记录合约组的实时价格，以优化策略",
+    "last_opened_file_path": "D:/My Workspaces/2023/qmthelper3"
   }
 }]]></component>
   <component name="SharedIndexes">

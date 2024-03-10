@@ -6,7 +6,7 @@ from center.trader import BacktestOptionTrader
 
 base_dir = r'D:\My Workspaces\2023\ETFOptions\data\options\wind'
 start_date = date(2020, 6, 17)
-end_date = date(2023, 12, 31)
+end_date = date(2020, 7, 22)
 store_host = '127.0.0.1'
 mq_params = {
     'user_name': 'test',

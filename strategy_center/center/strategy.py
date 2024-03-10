@@ -21,11 +21,17 @@ class OptionStrategy(BaseStrategy):
     
     def on_bars(self, bars):
         super().on_bars(bars)
-        if self.groups == []:
-            self.load()
         
     def load(self):
         print('请在继承类中实现load方法')
+    
+    def subscribe(self, undl_symbol):
+        symbols = []
+        for group in self.groups:
+            symbols.extend(group.options)
+        symbols = list(set(symbols))
+        [self.data_feed.add_symbol_and_data(undl_symbol, symbol) for symbol in symbols]
+        self.day_contracts = symbols
     
     def on_trade_response(self, body):
         try:
