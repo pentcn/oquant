@@ -29,15 +29,16 @@ class DualDragonCombinations(OptionGroup):
         dt = datetime.strptime(undl_bar['datetime'], '%Y-%m-%d %H:%M:%S')
         
         # 每天9:30卖出一组期权
-        if self.is_dairy_task and self._is_none_group() and dt.time() == time(9, 30):
-            if dt.date() == date(2020, 6, 17):
-                self._sell_options(undl_bar)
+        # if self.is_dairy_task and self._is_none_group() and dt.time() == time(9, 30):
+        #     if dt.date() == date(2020, 6, 17):
+        #         self._sell_options(undl_bar)
         
-        # if self.is_dairy_task:
-        #     if dt.time() == time(9, 30):
-        #         self._sell_call(undl_bar)
-        #     elif dt.time == time(9, 31):
-        #         self._sell_put(undl_bar)
+        if self.is_dairy_task:
+            if dt.date() == date(2020, 6, 17):
+                if dt.time() == time(9, 35):
+                    self._sell_call(undl_bar)
+                elif dt.time() == time(9, 41):
+                    self._sell_put(undl_bar)
         
         
         
@@ -135,7 +136,7 @@ class DualDragonCombinations(OptionGroup):
         
         if self.call_info is not None:
             call_symbol = self.call_info['symbol']        
-        self.combinate(call_symbol, -self.amount, put_symbol, -self.amount)
+            self.combinate(call_symbol, -self.amount, put_symbol, -self.amount)
             
     
     def _is_none_group(self):
