@@ -34,9 +34,9 @@ class DualDragonCombinations(OptionGroup):
         #         self._sell_options(undl_bar)
         
         if self.is_dairy_task:
-            if dt.date() == date(2020, 6, 17):
-                if dt.time() == time(9, 30):
-                    ic('注意：仅仅为了测试一组')
+            # if dt.date() == date(2020, 6, 17):
+            #     if dt.time() == time(9, 30):
+            #         ic('注意：仅仅为了测试一组')
                 if dt.time() == time(9, 35):
                     self._sell_call(undl_bar)
                 elif dt.time() == time(9, 41):
