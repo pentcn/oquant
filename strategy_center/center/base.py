@@ -169,7 +169,7 @@ class BaseTrader(ABC):
         ...
 
 
-class OptionGroup(ABC):
+class BaseGroup(ABC):
     def __init__(self, strategy):
         self.id = None
         self.options = []
