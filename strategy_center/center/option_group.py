@@ -37,7 +37,14 @@ class OptionGroup(BaseGroup):
         return exit_date.strftime('%Y-%m-%d')
 
     def find_contract_symbol(self, base_price, month_type, option_type, step):
-        symbol_info = self.strategy.data_feed.get_option_symbol_by_percent(self.strategy.underlying_symbol, 
+        if type(step) is float:
+            symbol_info = self.strategy.data_feed.get_option_symbol_by_percent(self.strategy.underlying_symbol, 
+                                                            base_price, 
+                                                            month_type, 
+                                                            option_type, 
+                                                            step if option_type=='购' else -step)
+        elif type(step) is int:
+            symbol_info = self.strategy.data_feed.get_option_symbol_by_rank(self.strategy.underlying_symbol, 
                                                             base_price, 
                                                             month_type, 
                                                             option_type, 
@@ -49,7 +56,7 @@ class OptionGroup(BaseGroup):
             symbol = symbol_info[idx]['code']
             price = int(symbol_info[idx]['strike_price']) / 1000
             
-            if (option_type == '购' and price > base_price * 1.01) or (option_type == '沽' and price < base_price * 0.99):
+            if (option_type == '购' and price > base_price) or (option_type == '沽' and price < base_price):
                 return symbol
 
     def get_symbol_and_price(self, base_price, month_type, option_type, datetime, step):
@@ -64,26 +71,36 @@ class OptionGroup(BaseGroup):
         return None, None
 
     def find_target(self, base_price, option_type, sdatetime, exit_days, step, move_ratio, extra_info={}):
+        def get_target_info(base_price, option_type, move_ratio, extra_info, dt, expired_date, month_type, symbol, price):
+            exit_date = self.get_pallel_date(dt, month_type, expired_date)
+            move_price = self.get_move_price(base_price, symbol, move_ratio)
+            extra_key = 'call' if option_type == '购' else 'put'
+            extra_value = {
+                        'symbol': symbol,
+                        'price': price,
+                        'exit_date': exit_date,
+                        'move_price': move_price,
+                        }
+            extra_value.update(extra_info)
+            extra_info = {'group': {extra_key: extra_value}}
+            return symbol, price, extra_info    
+        
         dt = datetime.strptime(sdatetime, '%Y-%m-%d %H:%M:%S')
         expired_date = get_fourth_wednesday(dt.year, dt.month)
         start_month_type = 1 if (expired_date - dt.date()).days <= exit_days else 0
         for month_type in range(start_month_type, 4):
             symbol, price = self.get_symbol_and_price(base_price, month_type, option_type, sdatetime, step)
             if price is not None:
-                exit_date = self.get_pallel_date(dt, month_type, expired_date)
-                move_price = self.get_move_price(base_price, symbol, move_ratio)
-                extra_key = 'call' if option_type == '购' else 'put'
-                extra_value = {
-                        'symbol': symbol,
-                        'price': price,
-                        'exit_date': exit_date,
-                        'move_price': move_price,
-                        }
-                extra_value.update(extra_info)
-                extra_info = {'group': {extra_key: extra_value}}
-                return symbol, price, extra_info
-            
-        raise Exception('无法找到交易标的')
+                return get_target_info(base_price, option_type, move_ratio, extra_info, dt, expired_date, month_type, symbol, price)
+        
+        return None, None, None
+        # 如果没有找到合约，找反方向的实值合约，做同方向操作
+        # op_type = '沽' if option_type == '购' else '购'
+        # symbol, price = self.get_symbol_and_price(base_price, month_type, op_type, sdatetime, step)
+        # if price is not None:
+        #     return get_target_info(base_price, option_type, move_ratio, extra_info, dt, expired_date, month_type, symbol, price)
+
+        # raise Exception('无法找到交易标的')
 
     def get_move_price(self, undl_price, symbol, move_ratio, is_out_money=True):
         name = self.strategy.data_feed.get_option_name(symbol)
@@ -145,15 +162,16 @@ class StraddleGroup(OptionGroup):
                                                                         'amount': self.amount,
                                                                         'move_ratio': self.move_ratio
                                                                         })
-
-                extra_info['group'][op_type2]['exit_date'] = base_info['exit_date']
+                if base_symbol is not None:
+                    extra_info['group'][op_type2]['exit_date'] = base_info['exit_date']
                 
                 # 平仓超价的合约
                 bar = data_feed.get_option_bar(underlying_symbol, base_info['symbol'], undl_time)
                 self.long_close(base_info['symbol'], abs(base_info['amount']), bar['close'])
                 
                 # 开仓新合约
-                self.short_open(base_symbol, abs(base_info['amount']), base_price, extra_info)
+                if base_symbol is not None:
+                    self.short_open(base_symbol, abs(base_info['amount']), base_price, extra_info)
                 
                 # 作另一端合约的处理
                 if both:
@@ -180,16 +198,22 @@ class StraddleGroup(OptionGroup):
                     self.long_close(other_info['symbol'], abs(other_info['amount']), bar['close'])
                 
                     # 开仓新合约
-                    self.short_open(other_symbol, abs(other_info['amount']), other_price, extra_info)
+                    if base_symbol is not None:
+                        self.short_open(other_symbol, abs(other_info['amount']), other_price, extra_info)
+                elif base_symbol is None:
+                    # 平仓以前组合的合约
+                    bar = data_feed.get_option_bar(underlying_symbol, other_info['symbol'], undl_time)
+                    self.long_close(other_info['symbol'], abs(other_info['amount']), bar['close'])
                 
-                if both:
-                    self.combinate(base_symbol, base_info['amount'], other_symbol, other_info['amount'])
-                else:
-                    self.combinate(base_symbol, base_info['amount'], other_info['symbol'], other_info['amount'])
                 
+                if base_symbol is not None:
+                    if both:
+                        self.combinate(base_symbol, base_info['amount'], other_symbol, other_info['amount'])
+                    else:
+                        self.combinate(base_symbol, base_info['amount'], other_info['symbol'], other_info['amount'])
+                    
                 if hasattr(self, 'on_moved'):
-                    self.on_moved()
-   
+                    self.on_moved(undl_time, undl_price)
    
     def _sell_options(self, undl_bar):
         self._sell_call(undl_bar)
@@ -207,11 +231,16 @@ class StraddleGroup(OptionGroup):
                                                                 'move_ratio': self.move_ratio
                                                             }
                                                                )
-        self.short_open(call_symbol, self.amount, call_price, extra_info)
-        
-        if self.put_info is not None:
-            put_symbol = self.put_info['symbol']
-            self.combinate(call_symbol, -self.amount, put_symbol, -self.amount)
+        if call_symbol is not None:
+            self.short_open(call_symbol, self.amount, call_price, extra_info)
+            
+            if self.put_info is not None:
+                put_symbol = self.put_info['symbol']
+                self.combinate(call_symbol, -self.amount, put_symbol, -self.amount)
+        elif self.put_info is not None:
+            # 如何当天的合约范围操过指定范围，则平仓本group
+            bar = self.strategy.data_feed.get_option_bar(self.strategy.underlying_symbol, self.put_info['symbol'], undl_bar['datetime'])
+            self.long_close(self.put_info['symbol'], abs(self.put_info['amount']), bar['close'])
         
     def _sell_put(self, undl_bar):
         put_symbol, put_price, extra_info = self.find_target(undl_bar['close'], 
@@ -225,11 +254,16 @@ class StraddleGroup(OptionGroup):
                                                               'move_ratio': self.move_ratio
                                                               }
                                                              )
-        self.short_open(put_symbol, self.amount, put_price, extra_info)
-        
-        if self.call_info is not None:
-            call_symbol = self.call_info['symbol']        
-            self.combinate(call_symbol, -self.amount, put_symbol, -self.amount)
+        if put_symbol is not None:
+            self.short_open(put_symbol, self.amount, put_price, extra_info)
+            
+            if self.call_info is not None:
+                call_symbol = self.call_info['symbol']        
+                self.combinate(call_symbol, -self.amount, put_symbol, -self.amount)
+        elif self.call_info is not None:
+            # 如何当天的合约范围操过指定范围，则平仓本group
+            bar = self.strategy.data_feed.get_option_bar(self.strategy.underlying_symbol, self.call_info['symbol'], undl_bar['datetime'])
+            self.long_close(self.call_info['symbol'], abs(self.call_info['amount']), bar['close'])
     
     def _is_none_group(self):
         return self.call_info is None and self.put_info is None
@@ -253,7 +287,7 @@ class StraddleGroup(OptionGroup):
 
 
 class DualDragonCombinations(StraddleGroup):
-    def __init__(self, strategy, amount=1, move_ratio=0.5, exit_days=25, step=0.06, both_moving=False, is_dairy_task=True):
+    def __init__(self, strategy, amount=1, move_ratio=0.5, exit_days=25, step=3, both_moving=False, is_dairy_task=True):
         super().__init__(strategy, amount, move_ratio, exit_days, step, both_moving)
         
         self.is_dairy_task = is_dairy_task
@@ -296,8 +330,30 @@ class DualDragonCombinations(StraddleGroup):
                 elif pos['type'] == 'put':
                     self.put_info = pos
                     
-    def on_moved(self):
-        ic('moved')
+    def on_moved(self, undl_time, undl_price):
+        long_step = 1
+        test = self.find_target(undl_price, 
+                         '沽', 
+                         undl_time, 
+                         self.exit_days, 
+                         long_step, 
+                         self.move_ratio,
+                         {                        
+                            'amount': self.amount,
+                            'move_ratio': self.move_ratio
+                            })
+        
+        test_1 = self.find_target(undl_price, 
+                         '购', 
+                         undl_time, 
+                         self.exit_days, 
+                         long_step, 
+                         self.move_ratio,
+                         {                        
+                            'amount': self.amount,
+                            'move_ratio': self.move_ratio
+                            })
+        # ic(undl_time, undl_price, test, test_1)
 
 
     

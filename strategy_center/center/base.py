@@ -195,16 +195,16 @@ class BaseGroup(ABC):
     
     def on_bars(self, bars):
         self.last_bars = bars
+        dt = list(bars.values())[0]['datetime']
         if len(bars) > 1:
-            dt = list(bars.values())[0]['datetime']
             data = {k:v['close'] for k, v in bars.items()}
             self.history_bars.update({dt: data})
             
-            if self.run_mode == RunMode.BACKTEST:
-                if datetime.strptime(dt, '%Y-%m-%d %H:%M:%S').time() == time(15):
-                    self.save_prices(self.history_bars)
-            else:
-                print('Todo: 在实盘模式下，保存交易单元的K线')
+        if self.run_mode == RunMode.BACKTEST:
+            if datetime.strptime(dt, '%Y-%m-%d %H:%M:%S').time() == time(15):
+                self.save_prices(self.history_bars)
+        else:
+            print('Todo: 在实盘模式下，保存交易单元的K线')
     
     def save_prices(self, prices):
         self.strategy.groups_prices_store.save(self.strategy.id, self.id, prices)

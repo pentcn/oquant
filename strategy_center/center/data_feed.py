@@ -43,6 +43,7 @@ class WindETFOptionFileData(OptionsDataFeed):
         df = self.contracts_info[underly_symbol]
         data_path = df.loc[df['code']==option_symbol]['remark'].values[0]
         data = pd.read_csv(data_path)
+        data.ffill(inplace=True)
         self.contracts_data[option_symbol] = data
     
     def remove_symbol(self, symbol):
@@ -126,6 +127,32 @@ class WindETFOptionFileData(OptionsDataFeed):
         
         return df[['code', 'strike_price']].to_dict(orient='records') if not df.empty else None
     
+    def get_option_symbol_by_rank(self, underly_symbol, base_price, month_type, op_type, rank, has_appendix=False):
+        df = self.contracts_info[underly_symbol]
+        month = self.sort_month(list(set(list(df['month'].astype(int).values))))[month_type]
+        df = df.loc[df['month']==str(month)]
+        df = df.loc[df['option_type']==op_type]
+        df = df.loc[df['appendix']!=''] if has_appendix else df.loc[df['appendix']=='']
+        df = df.loc[df['option_type']==op_type]
+        
+        df = df.sort_values('strike_price')
+        df.reset_index(drop=True, inplace=True)
+        
+        strike_price = df['strike_price'].astype(int).values 
+        diff = [abs(p-base_price * 1000) for p in strike_price]
+        atm_index = [i for i, v in enumerate(diff) if v == min(diff)]
+        if len(atm_index) == 1 or rank > 0:
+            atm_index = atm_index[0]
+        else:
+            atm_index = atm_index[-1]
+            
+        strike_indexes = list(df.index)
+        strike_indexes = [idx-atm_index for idx in strike_indexes]
+        indexes = [i for i, v in enumerate(strike_indexes) if v == rank ]
+        df = df.loc[indexes]
+        
+        return df[['code', 'strike_price']].to_dict(orient='records') if not df.empty else None
+        
     def get_option_name(self, symbol):
         for _, df in self.contracts_info.items():
             contract = df.loc[df['code']==symbol, 'remark']
@@ -142,6 +169,7 @@ class WindETFOptionFileData(OptionsDataFeed):
             df = self.contracts_info[underly_symbol]
             data_path = df.loc[df['code']==option_symbol]['remark'].values[0]
             data = pd.read_csv(data_path)
+            data.ffill(inplace=True)
             self.contracts_data[option_symbol] = data
         
         df = self.contracts_data[option_symbol]
@@ -172,6 +200,7 @@ class WindETFOptionFileData(OptionsDataFeed):
             data_path = self.base_path / name / 'underlying' / '1min'/ f'{active_date.strftime("%Y%m%d")}.csv'
             if data_path.exists():
                 data_df = pd.read_csv(data_path)
+                data_df.ffill(inplace=True)
                 all_df[symbol] = data_df
         
         for symbol in self.contract_symbols:
@@ -179,6 +208,7 @@ class WindETFOptionFileData(OptionsDataFeed):
             if data_path is None:
                 continue
             data_df = pd.read_csv(data_path)
+            data_df.ffill(inplace=True)
             all_df[symbol] = data_df
             
         for i, contract_path in enumerate(contract_root_path):
